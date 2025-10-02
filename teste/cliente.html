@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Cliente | Dona Bell</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #fff8f8;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #a80000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin: 10px 0;
+      display: block;
+      font-weight: bold;
+    }
+
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+
+    .main {
+      flex-grow: 1;
+      padding: 40px;
+    }
+
+    .header {
+      font-size: 28px;
+      font-weight: bold;
+      color: #a80000;
+      margin-bottom: 20px;
+    }
+
+    .pedido {
+      background-color: #fff;
+      border-left: 5px solid #a80000;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .pedido h3 {
+      margin: 0;
+    }
+
+    .btn-novo {
+      background-color: #a80000;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 30px;
+    }
+
+    .btn-novo:hover {
+      background-color: #880000;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Dona Bell</h2>
+    <a href="#">Meus Pedidos</a>
+    <a href="#">Novo Pedido</a>
+    <a href="#">Perfil</a>
+    <a href="#">Sair</a>
+  </div>
+
+  <div class="main">
+    <div class="header">Bem-vindo(a), Cliente!</div>
+
+    <button class="btn-novo">Fazer Novo Pedido</button>
+
+    <div class="pedido">
+      <h3>Pedido #1024</h3>
+      <p>Status: Em produção</p>
+      <p>Itens: 2 Pastéis, 1 Aipim frito</p>
+    </div>
+
+    <div class="pedido">
+      <h3>Pedido #1023</h3>
+      <p>Status: Entregue</p>
+      <p>Itens: 3 Coxinhas, 2 Empadas</p>
+    </div>
+  </div>
+</body>
+</html>

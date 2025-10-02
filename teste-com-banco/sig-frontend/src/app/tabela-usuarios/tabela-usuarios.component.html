@@ -1,0 +1,15 @@
+<h2>Usuários</h2>
+<button (click)="adicionarUsuario()">Adicionar Usuário</button>
+
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Nome</th>
+    <th>Email</th>
+  </tr>
+  <tr *ngFor="let usuario of usuarios">
+    <td>{{ usuario.id }}</td>
+    <td>{{ usuario.nome }}</td>
+    <td>{{ usuario.email }}</td>
+  </tr>
+</table>

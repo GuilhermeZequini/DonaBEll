@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dona Bell Produtos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: #fff5f5;
+      color: #333;
+    }
+    header {
+      background-color: #ffffff;
+      color: #b71c1c;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #b71c1c;
+    }
+    header h1 {
+      font-size: 32px;
+      color: #b71c1c;
+    }
+    nav a {
+      color: #b71c1c;
+      margin-left: 1.5rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .hero {
+      background-color: #d32f2f;
+      color: white;
+      padding: 4rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .hero-text {
+      max-width: 45%;
+    }
+    .hero-text h2 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+    .hero-text p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .hero-text button {
+      background: white;
+      color: #d32f2f;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .hero img {
+      max-width: 45%;
+      border-radius: 12px;
+    }
+    .products {
+      padding: 4rem 2rem;
+      background: #fff;
+      text-align: center;
+    }
+    .products h3 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: #b71c1c;
+    }
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .product {
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 250px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .product img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .product h4 {
+      margin: 0.8rem 0 0.3rem;
+      color: #b71c1c;
+    }
+    .product p {
+      font-size: 0.9rem;
+      color: #444;
+      margin-bottom: 0.3rem;
+    }
+    .product span {
+      color: #d32f2f;
+      font-weight: bold;
+    }
+    footer {
+      background: #b71c1c;
+      color: white;
+      text-align: center;
+      padding: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dona Bell Produtos</h1>
+    <nav>
+      <a href="#">Início</a>
+      <a href="#produtos">Produtos</a>
+      <a href="#contato">Contato</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h2>Delicious Food Products</h2>
+      <p>Crafted with care, our food products bring the best flavors to your table.</p>
+      <button>Shop Now</button>
+    </div>
+    <img src="https://images.unsplash.com/photo-1606112219348-204d7d8b94ee" alt="Salgadinhos Dona Bell">
+  </section>
+
+  <section class="products" id="produtos">
+    <h3>Our Products</h3>
+    <div class="product-list">
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1589308078050-aa1f6f5b69c2" alt="Strawberry Jam">
+        <h4>Strawberry Jam</h4>
+        <p>Sweet and tangy strawberry jam</p>
+        <span>$8.99</span>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587" alt="Pineapple Juice">
+        <h4>Pineapple Juice</h4>
+        <p>Refreshing and natural pineapple juice</p>
+        <span>$5.49</span>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092" alt="Chocolate Cookies">
+        <h4>Chocolate Cookies</h4>
+        <p>Crunchy and rich chocolate cookies</p>
+        <span>$6.29</span>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1606112219348-204d7d8b94ee" alt="Salgadinhos">
+        <h4>Pastel & Salgadinhos</h4>
+        <p>Crocantes e recheados na medida certa</p>
+        <span>$7.99</span>
+      </div>
+      <div class="product">
+        <img src="https://images.unsplash.com/photo-1604908177529-340e3f2986b7" alt="Tomato Sauce">
+        <h4>Tomato Sauce</h4>
+        <p>Molho de tomate caseiro e temperado</p>
+        <span>$4.99</span>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contato">
+    <p>© 2025 Dona Bell Produtos. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>

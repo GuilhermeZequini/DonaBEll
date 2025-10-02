@@ -1,0 +1,72 @@
+<app-navbar></app-navbar>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2 class="login-title">Login</h2>
+      <p class="login-subtitle">Entre na sua conta</p>
+    </div>
+    
+    <form class="login-form">
+      <div class="form-grupo">
+        <label for="email" class="form-label">Usuário</label>
+        <input class="input-simples"
+          id="email"
+          name="email"
+          type="email" 
+          placeholder="Digite seu usuário"
+          [(ngModel)]="login"
+        >
+      </div>
+      
+      <div class="form-grupo">
+        <label for="input-senha" class="form-label">Senha</label>
+        <input class="input-simples"
+          id="input-senha" 
+          name="input-senha"          
+          type="password" 
+          placeholder="Digite sua senha"
+          [(ngModel)]="senha"
+        >
+      </div>
+      
+      <button type="submit" class="login-button"
+        [disabled]="!login || !senha"
+        (click)="onBotaoClicado();"
+        >Entrar</button>
+      
+      <div class="login-footer">
+        <a href="#" class="forgot-link">Esqueci minha senha</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- 
+<div class="content-container">
+
+    <h1>{{login}}</h1>
+
+    <form >
+        <label for="email">Login</label>
+        <input class="input-simples"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Digite seu email"
+            
+            >
+
+        <label for="senha">Senha</label>
+        <input class="input-simples"
+        id="senha"
+        name="senha"
+        type="password"
+        placeholder="Digite sua senha"
+        >
+
+        
+    </form>
+</div> -->

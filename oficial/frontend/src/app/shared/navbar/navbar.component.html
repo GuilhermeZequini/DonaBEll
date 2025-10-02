@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg w-100 bg-color" >
+    <div class="container-fluid">
+        
+        <!-- Logo -->
+        @if (exibirLogo){
+            <a class="navbar-brand" href="/">
+                Donna Bella
+            </a>
+        }
+
+        
+        <!-- Botão Hambúrguer (Mobile) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Links -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav" >
+            <ul class="navbar-nav d-flex flex-column flex-lg-row gap-3">
+                @for (item of itensMenu; track item) {
+                    <li class="nav-item" routerLink="{{ item.link }}">
+                        <a class="nav-link fw-bold" >{{ item.label }}</a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+    </div>
+</nav>
