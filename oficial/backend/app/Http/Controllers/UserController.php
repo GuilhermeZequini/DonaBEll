@@ -7,23 +7,25 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
-use Illuminate\Session\Store;
+
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(request $request)
     {
-        $users = User::all();
 
-        return response()->json($users, 200);
+        $currentPage = $request->get('current_page') ?? 1; // página atual
+        $regPerPage = 10; // registros por página
+        $skip = ($currentPage - 1) * $regPerPage; // isso faz co  que a pagina 1 comece do registro 0 e a pagina 2 = 10
+        $users = User::skip($skip)->take($regPerPage)->orderBy('id')->get();
+
+        return response()->json($users->toResourceCollection(), 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(StoreUserRequest $request)
     {
         $data = $request ->validated();
@@ -34,7 +36,7 @@ class UserController extends Controller
             $user->password = Hash::make('password123');
             $user->save();
 
-            return response()->json($user, 201);
+            return response()->json($user->toResource(), 201);
 
         } catch (\Exception $Th) {
             return response()->json(['message' => 'Falha ao criar usuário'], 400);
@@ -47,7 +49,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            return response()->json($user, 200);
+            return response()->json($user->toResource(), 200);
 
         } catch (\Exception $Th) {
             return response()->json(['message' => 'Falha ao procurar usuário'], 404);
@@ -63,7 +65,7 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             $user->update($data);
 
-            return response()->json($user, 200);
+            return response()->json($user->toResource(), 200);
 
         } catch (\Exception $ex) {
             return response()->json(['message' => 'Falha ao alterar usuário'], 400);
