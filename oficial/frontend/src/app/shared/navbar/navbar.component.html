@@ -1,29 +1,38 @@
-<nav class="navbar navbar-expand-lg w-100 bg-color" >
-    <div class="container-fluid">
-        
-        <!-- Logo -->
-        @if (exibirLogo){
-            <a class="navbar-brand" href="/">
-                Donna Bella
-            </a>
-        }
+<div class="container">
+  <nav class="navbar navbar-expand-lg w-100 bg-color ">
 
-        
-        <!-- Botão Hambúrguer (Mobile) -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <!-- Links -->
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav" >
-            <ul class="navbar-nav d-flex flex-column flex-lg-row gap-3">
-                @for (item of itensMenu; track item) {
-                    <li class="nav-item" routerLink="{{ item.link }}">
-                        <a class="nav-link fw-bold" >{{ item.label }}</a>
-                    </li>
-                }
-            </ul>
-        </div>
-
+    <div class="navbar-brand-container">
+      @if (exibirLogo){
+      <a class="navbar-brand" href="/">
+        Dona Bell
+        <span class="brand-subtitle">PRODUTOS</span>
+      </a>
+      }
     </div>
-</nav>
+
+
+    <div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"> </span>
+      </button>
+    </div>
+
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav d-flex flex-column flex-lg-row gap-3">
+        @for (item of itensMenu; track item) {
+        <li class="nav-item" routerLink="{{ item.link }}">
+          <a class="nav-link" [ngClass]="{ 'login-btn': item.isLogin }">
+            @if (item.icon) {
+            <img [src]="item.icon" alt="Login" width="18" height="18" />
+            }
+            {{ item.label }}
+          </a>
+        </li>
+        }
+      </ul>
+    </div>
+
+
+  </nav>
+</div>

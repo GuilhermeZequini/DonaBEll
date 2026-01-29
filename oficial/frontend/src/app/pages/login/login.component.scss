@@ -5,7 +5,7 @@
 .login-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e53935 0%, #810e0c 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -63,13 +63,13 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #810e0c;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #e53935;
   color: white;
   border: none;
   padding: 14px;
@@ -106,14 +106,14 @@
 }
 
 .forgot-link {
-  color: #667eea;
+  color: #000000;
   text-decoration: none;
   font-size: 14px;
   transition: color 0.3s ease;
 }
 
 .forgot-link:hover {
-  color: #764ba2;
+  color: #e53935;
   text-decoration: underline;
 }
 
@@ -123,7 +123,7 @@
     padding: 30px 20px;
     margin: 10px;
   }
-  
+
   .login-title {
     font-size: 24px;
   }

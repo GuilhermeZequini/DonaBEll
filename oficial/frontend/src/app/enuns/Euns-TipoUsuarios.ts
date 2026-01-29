@@ -1,4 +1,7 @@
-export enum TipoUsuarios{ 
-    Gentente = "gentente",
-    Cliente = 'Cliente',
+export enum TipoUsuarios{
+  Administrador = "administrador",
+  Gentente = "gentente",
+  Cliente = 'Cliente',
+  Producao = 'Producao',
+  Entregador = 'Entregador'
 }

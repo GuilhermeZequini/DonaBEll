@@ -12,5 +12,8 @@ use App\Http\Controllers\UserController;
 //Route::post('/users', [UserController::class, 'store']);
 
 // jeito mais simples com o laravel
+
+
+
 Route::apiResource('users', UserController::class);
 

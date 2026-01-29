@@ -1,1 +1,111 @@
-<p>pessoas-listagem works!</p>
+<div class="content-container">
+  <!-- Status de carregamento e erro -->
+  @if (loading) {
+    <div class="loading">Carregando...</div>
+  }
+
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+
+  <!-- Controles de paginação no TOPO -->
+  @if (!loading && !error && totalPaginas > 1) {
+    <div class="paginacao-superior">
+      <div class="info-paginacao">
+        Página {{ paginaAtual }} de {{ totalPaginas }}
+        (Total: {{ totalUsuarios }} usuários)
+      </div>
+    </div>
+  }
+
+  <!-- Tabela de dados -->
+  @if (!loading && !error) {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Data Cadastro</th>
+          <th>Data de Atualização</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (ListarUsuarios.length > 0) {
+          @for (usuario of ListarUsuarios; track usuario.id) {
+            <tr>
+              <td>{{ usuario.id }}</td>
+              <td>{{ usuario.name }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.data_cadastro | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ usuario.data_atualizacao | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <button class="btn-editar" [routerLink]="['alterar', usuario.id]">Editar</button>
+                <button class="btn-excluir" (click)="excluir(usuario.id)">Excluir</button>
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td colspan="6" style="text-align: center;">Nenhum usuário encontrado</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Controles de paginação no RODAPÉ -->
+    @if (totalPaginas > 1) {
+      <div class="controles-paginacao">
+        <button
+          class="btn-paginacao"
+          [disabled]="paginaAtual === 1"
+          (click)="mudarPagina(1)">
+          « Primeira
+        </button>
+
+        <button
+          class="btn-paginacao"
+          [disabled]="paginaAtual === 1"
+          (click)="mudarPagina(paginaAtual - 1)">
+          ‹ Anterior
+        </button>
+
+        <!-- Números das páginas -->
+        @for (pagina of paginas; track pagina) {
+          <button
+            class="btn-paginacao {{ pagina === paginaAtual ? 'ativa' : '' }}"
+            (click)="mudarPagina(pagina)">
+            {{ pagina }}
+          </button>
+        }
+
+        <button
+          class="btn-paginacao"
+          [disabled]="paginaAtual === totalPaginas"
+          (click)="mudarPagina(paginaAtual + 1)">
+          Próxima ›
+        </button>
+
+        <button
+          class="btn-paginacao"
+          [disabled]="paginaAtual === totalPaginas"
+          (click)="mudarPagina(totalPaginas)">
+          Última »
+        </button>
+
+        <!-- Seletor de página (opcional) -->
+        <div class="seletor-pagina">
+          <span>Ir para página:</span>
+          <input
+            type="number"
+            min="1"
+            [max]="totalPaginas"
+            [(ngModel)]="paginaAtual"
+            (keyup.enter)="mudarPagina(paginaAtual)">
+          <button (click)="mudarPagina(paginaAtual)">Ir</button>
+        </div>
+      </div>
+    }
+  }
+</div>

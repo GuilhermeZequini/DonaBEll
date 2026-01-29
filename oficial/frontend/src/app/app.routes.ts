@@ -10,7 +10,7 @@ export const routes: Routes = [
         title: 'Home'
     },
     {
-        path: 'pessoa/login',
+        path: 'login',
         component : LoginComponent,
         title: 'Login'
     },
