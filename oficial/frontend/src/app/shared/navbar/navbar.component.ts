@@ -13,7 +13,7 @@ export class NavbarComponent {
   exibirLogo: boolean = true;
 
   itensMenu = [
-    { label: 'Home', link: '/' },
+    { label: 'Inicio', link: '/' },
     { label: 'Sobre', link: '/sobre' },
     { label: 'Contato', link: '/contato' },
     { label: 'Login', link: '/login', icon: '/icons/login.svg', isLogin: true }, // ess islongin serve para lincar com a classe css

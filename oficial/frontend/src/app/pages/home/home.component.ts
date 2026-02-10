@@ -1,10 +1,8 @@
-import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import {ChangeDetectionStrategy, Component, computed, signal} from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
+import { FooterComponent } from "../../shared/footer/footer.component";
 
 
 export interface Task {
@@ -16,7 +14,7 @@ export interface Task {
 
 @Component({
   selector: 'app-home',
-  imports: [MatDividerModule,NavbarComponent,RouterOutlet],
+  imports: [MatDividerModule, NavbarComponent, RouterOutlet, FooterComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
