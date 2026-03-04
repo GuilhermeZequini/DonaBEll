@@ -1,0 +1,28 @@
+<header class="painel-navbar">
+  <div class="painel-navbar__container">
+    <a routerLink="/painel" class="painel-navbar__brand">
+      Dona Bell
+      <span class="painel-navbar__brand-sub">Painel</span>
+    </a>
+    <nav class="painel-navbar__right">
+      @if (usuario) {
+        <span class="painel-navbar__user">
+          <span class="painel-navbar__nome">{{ usuario.nome }}</span>
+          <span class="painel-navbar__perfil">{{ formatarPerfil(usuario.tipo_perfil) }}</span>
+        </span>
+        <button type="button" class="painel-navbar__sair" (click)="logout()">
+          Sair
+        </button>
+      }
+    </nav>
+  </div>
+</header>
+
+<main class="painel-conteudo">
+  @if (usuario) {
+    <section class="painel-bemvindo">
+      <h1 class="painel-bemvindo__titulo">Bem-vindo, {{ usuario.nome }}</h1>
+      <p class="painel-bemvindo__perfil">{{ formatarPerfil(usuario.tipo_perfil) }}</p>
+    </section>
+  }
+</main>

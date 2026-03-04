@@ -1,0 +1,50 @@
+<div class="usuario-form-pagina">
+  <div class="usuario-form-pagina__header">
+    <a routerLink="/painel/usuarios" class="usuario-form-pagina__voltar">← Voltar</a>
+    <h1 class="usuario-form-pagina__titulo">{{ isEdicao ? 'Editar usuário' : 'Novo usuário' }}</h1>
+  </div>
+
+  @if (carregando) {
+    <p class="usuario-form-pagina__loading">Carregando...</p>
+  } @else if (erro && !enviando) {
+    <p class="usuario-form-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (!carregando) {
+    <form class="usuario-form" (ngSubmit)="salvar()">
+      @if (erro && enviando) {
+        <p class="usuario-form__erro">{{ erro }}</p>
+      }
+      <div class="usuario-form__grupo">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" [(ngModel)]="nome" name="nome" required maxlength="255" />
+      </div>
+      <div class="usuario-form__grupo">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" [(ngModel)]="email" name="email" />
+      </div>
+      <div class="usuario-form__grupo">
+        <label for="senha">Senha {{ isEdicao ? '(deixe em branco para não alterar)' : '' }}</label>
+        <input id="senha" type="password" [(ngModel)]="senha" name="senha" [required]="!isEdicao" minlength="4" />
+      </div>
+      <div class="usuario-form__grupo">
+        <label for="tipo_perfil">Perfil</label>
+        <select id="tipo_perfil" [(ngModel)]="tipo_perfil" name="tipo_perfil">
+          @for (p of perfilOptions; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+      </div>
+      <div class="usuario-form__grupo usuario-form__grupo--checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="ativo" name="ativo" />
+          Ativo
+        </label>
+      </div>
+      <div class="usuario-form__acoes">
+        <button type="submit" [disabled]="enviando">{{ enviando ? 'Salvando...' : 'Salvar' }}</button>
+        <a routerLink="/painel/usuarios" class="usuario-form__cancelar">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

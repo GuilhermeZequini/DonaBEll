@@ -4,21 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 
 class AuthController extends Controller
 {
-  public function login(Request $request)
+    public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string',
             'senha' => 'required'
         ]);
 
-        $usuario = Usuario::where('email', $request->email)->first();
+        $email = $request->email;
+        $senha = $request->senha;
 
-        if (!$usuario || $usuario->senha !== $request->senha) {
+        $usuario = Usuario::where('email', $email)->first();
+        if (!$usuario) {
             return response()->json(['error' => 'Credenciais inválidas'], 401);
+        }
+        if (!Hash::check($senha, $usuario->senha)) {
+            // Migração: se a senha antiga estava em texto puro, valida e converte para hash
+            if ($usuario->senha === $senha) {
+                $usuario->senha = Hash::make($senha);
+                $usuario->save();
+            } else {
+                return response()->json(['error' => 'Credenciais inválidas'], 401);
+            }
+        }
+
+        if (!$usuario->ativo) {
+            return response()->json(['error' => 'Usuário inativo'], 403);
         }
 
         // 4️⃣ gera token

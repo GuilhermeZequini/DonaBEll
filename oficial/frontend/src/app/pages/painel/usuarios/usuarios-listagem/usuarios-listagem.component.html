@@ -1,0 +1,123 @@
+<div class="usuarios-pagina">
+  <div class="usuarios-pagina__header">
+    <div>
+      <h1 class="usuarios-pagina__titulo">Usuários</h1>
+      <p class="usuarios-pagina__subtitulo">Cadastro e gestão de usuários</p>
+    </div>
+    <button type="button" class="usuarios-pagina__btn-novo" (click)="abrirNovo()">+ Novo usuário</button>
+  </div>
+
+  @if (erro) {
+    <p class="usuarios-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="usuarios-pagina__loading">Carregando...</p>
+  } @else if (usuarios.length === 0) {
+    <div class="usuarios-tabela-wrapper">
+      <table class="usuarios-tabela">
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>E-MAIL</th>
+            <th>PERFIL</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="usuarios-tabela__vazio">
+            <td colspan="5">
+              <div class="usuarios-vazio">
+                <p class="usuarios-vazio__texto">Nenhum usuário cadastrado.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="usuarios-tabela-wrapper">
+      <table class="usuarios-tabela">
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>E-MAIL</th>
+            <th>PERFIL</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of usuarios; track u.id) {
+            <tr>
+              <td>{{ u.nome }}</td>
+              <td>{{ u.email || '—' }}</td>
+              <td>{{ formatarPerfil(u.tipo_perfil) }}</td>
+              <td>{{ u.ativo ? 'Ativo' : 'Inativo' }}</td>
+              <td class="usuarios-tabela__acoes">
+                <button type="button" class="usuarios-tabela__link" (click)="abrirEditar(u)">Editar</button>
+                <button type="button" class="usuarios-tabela__btn-excluir" (click)="excluir(u)">Excluir</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!carregando && total > 0) {
+    <nav class="usuarios-pagina__paginacao" aria-label="Paginação">
+      <button type="button" class="usuarios-pagina__btn-pag" (click)="carregar(paginaAtual - 1)" [disabled]="paginaAtual <= 1">Anterior</button>
+      <span class="usuarios-pagina__info-pag">Página {{ paginaAtual }} de {{ ultimaPagina }} ({{ total }} itens)</span>
+      <button type="button" class="usuarios-pagina__btn-pag" (click)="carregar(paginaAtual + 1)" [disabled]="paginaAtual >= ultimaPagina">Próxima</button>
+    </nav>
+  }
+</div>
+
+<app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
+  <div class="usuario-form-modal">
+    @if (formErro) {
+      <p class="usuario-form-modal__erro">{{ formErro }}</p>
+    }
+    <form (ngSubmit)="salvar()">
+      <section class="usuario-form-secao">
+        <h3 class="usuario-form-secao__titulo">Informações</h3>
+        <div class="usuario-form-grid">
+          <div class="usuario-form-grupo usuario-form-grupo--full">
+            <label for="nome">Nome <span class="obrigatorio">*</span></label>
+            <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" required maxlength="255" />
+          </div>
+          <div class="usuario-form-grupo">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" [(ngModel)]="form.email" name="email" />
+          </div>
+          <div class="usuario-form-grupo">
+            <label for="senha">Senha {{ modalEdicao ? '(deixe em branco para não alterar)' : '*' }}</label>
+            <input id="senha" type="password" [(ngModel)]="form.senha" name="senha" [required]="!modalEdicao" minlength="4" />
+          </div>
+          <div class="usuario-form-grupo">
+            <label for="tipo_perfil">Perfil</label>
+            <select id="tipo_perfil" [(ngModel)]="form.tipo_perfil" name="tipo_perfil">
+              @for (p of perfilOptions; track p) {
+                <option [value]="p">{{ p }}</option>
+              }
+            </select>
+          </div>
+          <div class="usuario-form-grupo usuario-form-grupo--checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="form.ativo" name="ativo" />
+              Ativo
+            </label>
+          </div>
+        </div>
+      </section>
+      <div class="usuario-form-modal__acoes">
+        <button type="button" class="usuario-form-modal__btn-cancelar" (click)="fecharModal()">Cancelar</button>
+        <button type="submit" class="usuario-form-modal__btn-criar" [disabled]="enviando">
+          {{ enviando ? 'Salvando...' : (modalEdicao ? 'Salvar' : 'Criar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>

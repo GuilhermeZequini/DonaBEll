@@ -31,9 +31,9 @@
       </div>
       
       <button type="submit" class="login-button"
-        [disabled]="!login || !senha"
+        [disabled]="!login || !senha || carregando"
         (click)="onBotaoClicado();"
-        >Entrar</button>
+        >{{ carregando ? 'Entrando...' : 'Entrar' }}</button>
       
       <div class="login-footer">
         <a href="#" class="forgot-link">Esqueci minha senha</a>

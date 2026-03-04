@@ -1,0 +1,209 @@
+<div class="clientes-pagina">
+  <div class="clientes-pagina__header">
+    <div>
+      <h1 class="clientes-pagina__titulo">Clientes</h1>
+      <p class="clientes-pagina__subtitulo">Cadastro e gestão de clientes</p>
+    </div>
+    <button type="button" class="clientes-pagina__btn-novo" (click)="abrirNovo()">+ Novo Cliente</button>
+  </div>
+
+  <div class="clientes-pagina__filtros">
+    <div class="clientes-pagina__filtro">
+      <label for="tipo">Tipo de Cliente</label>
+      <select id="tipo" class="clientes-pagina__select" [(ngModel)]="filtroTipo" (ngModelChange)="carregar(1)">
+        <option value="">Todos</option>
+        <option value="PF">Pessoa Física</option>
+        <option value="PJ">Pessoa Jurídica</option>
+      </select>
+    </div>
+    <div class="clientes-pagina__filtro">
+      <label for="rota">Rota</label>
+      <select id="rota" class="clientes-pagina__select" [(ngModel)]="filtroRotaId" (ngModelChange)="carregar(1)">
+        <option [ngValue]="null">Todas as rotas</option>
+        @for (r of rotas; track r.id) {
+          <option [ngValue]="r.id">{{ r.nome }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (erro) {
+    <p class="clientes-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="clientes-pagina__loading">Carregando...</p>
+  } @else if (clientes.length === 0) {
+    <div class="clientes-tabela-wrapper">
+      <table class="clientes-tabela">
+        <thead>
+          <tr>
+            <th>CLIENTE</th>
+            <th>TIPO</th>
+            <th>CPF/CNPJ</th>
+            <th>CONTATO</th>
+            <th>ROTA</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="clientes-tabela__vazio">
+            <td colspan="7">
+              <div class="clientes-vazio">
+                <svg class="clientes-vazio__icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <p class="clientes-vazio__texto">Nenhum cliente encontrado</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="clientes-tabela-wrapper">
+      <table class="clientes-tabela">
+        <thead>
+          <tr>
+            <th>CLIENTE</th>
+            <th>TIPO</th>
+            <th>CPF/CNPJ</th>
+            <th>CONTATO</th>
+            <th>ROTA</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of clientes; track c.id) {
+            <tr>
+              <td>{{ c.nome }}</td>
+              <td>{{ tipoLabel(c.tipo_cliente) }}</td>
+              <td>{{ c.CNPJ_CPF }}</td>
+              <td>{{ c.telefone || c.email || '—' }}</td>
+              <td>{{ c.rota_nome || '—' }}</td>
+              <td>{{ c.ativo ? 'Ativo' : 'Inativo' }}</td>
+              <td class="clientes-tabela__acoes">
+                <button type="button" class="clientes-tabela__link" (click)="abrirEditar(c)">Editar</button>
+                <button type="button" class="clientes-tabela__btn-excluir" (click)="excluir(c)">Excluir</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!carregando && total > 0) {
+    <nav class="clientes-pagina__paginacao" aria-label="Paginação">
+      <button type="button" class="clientes-pagina__btn-pag" (click)="carregar(paginaAtual - 1)" [disabled]="paginaAtual <= 1">Anterior</button>
+      <span class="clientes-pagina__info-pag">Página {{ paginaAtual }} de {{ ultimaPagina }} ({{ total }} itens)</span>
+      <button type="button" class="clientes-pagina__btn-pag" (click)="carregar(paginaAtual + 1)" [disabled]="paginaAtual >= ultimaPagina">Próxima</button>
+    </nav>
+  }
+</div>
+
+<app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
+  <div class="cliente-form-modal">
+    @if (formErro) {
+      <p class="cliente-form-modal__erro">{{ formErro }}</p>
+    }
+    <form (ngSubmit)="salvar()">
+      <section class="cliente-form-secao">
+        <h3 class="cliente-form-secao__titulo">Informações Básicas</h3>
+        <div class="cliente-form-grid">
+          <div class="cliente-form-grupo">
+            <label for="nome">Nome <span class="obrigatorio">*</span></label>
+            <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" required maxlength="255" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="tipo_cliente">Tipo <span class="obrigatorio">*</span></label>
+            <select id="tipo_cliente" [(ngModel)]="form.tipo_cliente" name="tipo_cliente" required>
+              <option value="PF">Pessoa Física</option>
+              <option value="PJ">Pessoa Jurídica</option>
+            </select>
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="CNPJ_CPF">CPF/CNPJ <span class="obrigatorio">*</span></label>
+            <input id="CNPJ_CPF" type="text" [(ngModel)]="form.CNPJ_CPF" name="CNPJ_CPF" required maxlength="14" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="email">Email</label>
+            <input id="email" type="email" [(ngModel)]="form.email" name="email" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" type="text" [(ngModel)]="form.telefone" name="telefone" maxlength="20" />
+          </div>
+        </div>
+      </section>
+      <section class="cliente-form-secao">
+        <h3 class="cliente-form-secao__titulo">Endereço</h3>
+        <div class="cliente-form-grid">
+          <div class="cliente-form-grupo cliente-form-grupo--full">
+            <label for="rua">Rua</label>
+            <input id="rua" type="text" [(ngModel)]="form.rua" name="rua" maxlength="45" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="numero">Número</label>
+            <input id="numero" type="text" [(ngModel)]="form.numero" name="numero" maxlength="45" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="bairro">Bairro</label>
+            <input id="bairro" type="text" [(ngModel)]="form.bairro" name="bairro" maxlength="45" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="cidade">Cidade</label>
+            <input id="cidade" type="text" [(ngModel)]="form.cidade" name="cidade" maxlength="45" />
+          </div>
+          <div class="cliente-form-grupo">
+            <label for="complemento">Complemento</label>
+            <input id="complemento" type="text" [(ngModel)]="form.complemento" name="complemento" maxlength="45" />
+          </div>
+        </div>
+      </section>
+      <section class="cliente-form-secao">
+        <h3 class="cliente-form-secao__titulo">Rota de Entrega</h3>
+        <div class="cliente-form-grupo">
+          <label for="Rota_id">Rota de Entrega</label>
+          <select id="Rota_id" [(ngModel)]="form.Rota_id" name="Rota_id">
+            <option [ngValue]="null">Sem rota</option>
+            @for (r of rotas; track r.id) {
+              <option [ngValue]="r.id">{{ r.nome }}</option>
+            }
+          </select>
+        </div>
+      </section>
+      <section class="cliente-form-secao">
+        <h3 class="cliente-form-secao__titulo">Usuário do Sistema</h3>
+        @if (modalEdicao) {
+          @if (modalEdicao.tem_usuario) {
+            <p class="cliente-form-info">Este cliente possui usuário vinculado ({{ modalEdicao.email || 'sem email' }}).</p>
+          } @else {
+            <p class="cliente-form-info cliente-form-info--muted">Este cliente não possui usuário vinculado.</p>
+          }
+        } @else {
+          <p class="cliente-form-info">Será criado automaticamente um usuário para acesso ao sistema com senha padrão <strong>123456</strong>. O cliente poderá alterá-la após o primeiro login.</p>
+        }
+      </section>
+      @if (modalEdicao) {
+        <div class="cliente-form-grupo cliente-form-grupo--checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="form.ativo" name="ativo" />
+            Ativo
+          </label>
+        </div>
+      }
+      <div class="cliente-form-modal__acoes">
+        <button type="button" class="cliente-form-modal__btn-cancelar" (click)="fecharModal()">Cancelar</button>
+        <button type="submit" class="cliente-form-modal__btn-criar" [disabled]="enviando">
+          {{ enviando ? 'Salvando...' : (modalEdicao ? 'Salvar' : 'Criar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>

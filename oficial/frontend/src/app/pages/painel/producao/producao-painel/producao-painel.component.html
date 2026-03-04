@@ -1,0 +1,89 @@
+<div class="producao-pagina">
+  <div class="producao-pagina__header">
+    <h1 class="producao-pagina__titulo">Produção</h1>
+    <p class="producao-pagina__subtitulo">Pedidos por rota e consolidação para produção</p>
+  </div>
+
+  <div class="producao-pagina__abas">
+    <button type="button" class="producao-pagina__aba" [class.ativa]="abaAtiva === 'pedidos'" (click)="abaAtiva = 'pedidos'">
+      Pedidos por rota
+    </button>
+    <button type="button" class="producao-pagina__aba" [class.ativa]="abaAtiva === 'consolidacao'" (click)="abaAtiva = 'consolidacao'">
+      Consolidação
+    </button>
+  </div>
+
+  @if (erro) {
+    <p class="producao-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando && abaAtiva === 'pedidos') {
+    <p class="producao-pagina__loading">Carregando...</p>
+  }
+
+  @if (abaAtiva === 'pedidos' && !carregando) {
+    <div class="producao-colunas">
+      @for (col of colunasRotas; track col.rota?.id ?? col.rota?.nome ?? $index) {
+        <div class="producao-coluna">
+          <h3 class="producao-coluna__titulo">{{ col.rota?.nome ?? 'Rota' }}</h3>
+          @if (col.pedidos.length === 0) {
+            <p class="producao-coluna__vazio">Nenhum pedido</p>
+          } @else {
+            @for (ped of col.pedidos; track ped.id) {
+              <div class="producao-card">
+                <div class="producao-card__cabecalho">
+                  <strong>#{{ ped.id }}</strong> {{ ped.cliente_nome || 'Cliente' }}
+                </div>
+                <div class="producao-card__status">{{ statusLabel(ped.status) }}</div>
+                <div class="producao-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
+                <ul class="producao-card__itens">
+                  @for (item of (ped.itens ?? []); track $index) {
+                    <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                  }
+                </ul>
+                <div class="producao-card__acoes">
+                  @if (ped.status === 'APROVADO') {
+                    <button type="button" class="producao-card__btn" (click)="marcarEmProducao(ped.id)">Em produção</button>
+                  }
+                  @if (ped.status === 'EM_PRODUCAO') {
+                    <button type="button" class="producao-card__btn producao-card__btn--pronto" (click)="marcarPronto(ped.id)">Pronto</button>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (abaAtiva === 'consolidacao') {
+    <div class="producao-consolidacao">
+      @for (rota of consolidacao; track rota.rota_id ?? rota.rota_nome) {
+        <section class="producao-consolidacao__rota">
+          <h3 class="producao-consolidacao__titulo">{{ rota.rota_nome }}</h3>
+          @if (rota.produtos.length === 0) {
+            <p class="producao-consolidacao__vazio">Nenhum produto consolidado</p>
+          } @else {
+            <table class="producao-consolidacao__tabela">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Quantidade total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (linha of rota.produtos; track linha.Produto_id) {
+                  <tr>
+                    <td>{{ linha.produto_nome }}</td>
+                    <td>{{ linha.quantidade_total }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>

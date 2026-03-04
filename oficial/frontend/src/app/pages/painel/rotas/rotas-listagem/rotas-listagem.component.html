@@ -1,0 +1,114 @@
+<div class="rotas-pagina">
+  <div class="rotas-pagina__header">
+    <div>
+      <h1 class="rotas-pagina__titulo">Rotas</h1>
+      <p class="rotas-pagina__subtitulo">Cadastro e gestão de rotas de entrega</p>
+    </div>
+    <button type="button" class="rotas-pagina__btn-novo" (click)="abrirNovo()">+ Nova Rota</button>
+  </div>
+
+  @if (erro) {
+    <p class="rotas-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="rotas-pagina__loading">Carregando...</p>
+  } @else if (rotas.length === 0) {
+    <div class="rotas-tabela-wrapper">
+      <table class="rotas-tabela">
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>PRIORIDADE</th>
+            <th>DESCRIÇÃO</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="rotas-tabela__vazio">
+            <td colspan="5">
+              <div class="rotas-vazio">
+                <p class="rotas-vazio__texto">Nenhuma rota cadastrada.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="rotas-tabela-wrapper">
+      <table class="rotas-tabela">
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>PRIORIDADE</th>
+            <th>DESCRIÇÃO</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of rotas; track r.id) {
+            <tr>
+              <td>{{ r.nome }}</td>
+              <td>{{ r.ordem_prioridade }}</td>
+              <td>{{ r.descricao || '—' }}</td>
+              <td>{{ r.ativo ? 'Ativo' : 'Inativo' }}</td>
+              <td class="rotas-tabela__acoes">
+                <button type="button" class="rotas-tabela__link" (click)="abrirEditar(r)">Editar</button>
+                <button type="button" class="rotas-tabela__btn-excluir" (click)="excluir(r)">Excluir</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!carregando && total > 0) {
+    <nav class="rotas-pagina__paginacao" aria-label="Paginação">
+      <button type="button" class="rotas-pagina__btn-pag" (click)="carregar(paginaAtual - 1)" [disabled]="paginaAtual <= 1">Anterior</button>
+      <span class="rotas-pagina__info-pag">Página {{ paginaAtual }} de {{ ultimaPagina }} ({{ total }} itens)</span>
+      <button type="button" class="rotas-pagina__btn-pag" (click)="carregar(paginaAtual + 1)" [disabled]="paginaAtual >= ultimaPagina">Próxima</button>
+    </nav>
+  }
+</div>
+
+<app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
+  <div class="rota-form-modal">
+    @if (formErro) {
+      <p class="rota-form-modal__erro">{{ formErro }}</p>
+    }
+    <form (ngSubmit)="salvar()">
+      <section class="rota-form-secao">
+        <div class="rota-form-grid">
+          <div class="rota-form-grupo rota-form-grupo--full">
+            <label for="nome">Nome <span class="obrigatorio">*</span></label>
+            <input id="nome" type="text" [(ngModel)]="form.nome" name="nome" required maxlength="255" />
+          </div>
+          <div class="rota-form-grupo">
+            <label for="ordem_prioridade">Ordem / Prioridade</label>
+            <input id="ordem_prioridade" type="number" [(ngModel)]="form.ordem_prioridade" name="ordem_prioridade" min="0" />
+          </div>
+          <div class="rota-form-grupo rota-form-grupo--checkbox">
+            <label>
+              <input type="checkbox" [(ngModel)]="form.ativo" name="ativo" />
+              Ativo
+            </label>
+          </div>
+          <div class="rota-form-grupo rota-form-grupo--full">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" [(ngModel)]="form.descricao" name="descricao" rows="3"></textarea>
+          </div>
+        </div>
+      </section>
+      <div class="rota-form-modal__acoes">
+        <button type="button" class="rota-form-modal__btn-cancelar" (click)="fecharModal()">Cancelar</button>
+        <button type="submit" class="rota-form-modal__btn-criar" [disabled]="enviando">
+          {{ enviando ? 'Salvando...' : (modalEdicao ? 'Salvar' : 'Criar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>

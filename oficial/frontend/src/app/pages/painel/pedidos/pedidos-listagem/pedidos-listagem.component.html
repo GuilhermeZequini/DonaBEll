@@ -1,0 +1,147 @@
+<div class="pedidos-pagina">
+  <div class="pedidos-pagina__header">
+    <div>
+      <h1 class="pedidos-pagina__titulo">Pedidos</h1>
+      <p class="pedidos-pagina__subtitulo">Registro e acompanhamento de pedidos</p>
+    </div>
+    <button type="button" class="pedidos-pagina__btn-novo" (click)="abrirNovo()">+ Novo pedido</button>
+  </div>
+
+  <div class="pedidos-pagina__filtros">
+    <div class="pedidos-pagina__filtro">
+      <label for="status">Status</label>
+      <select id="status" class="pedidos-pagina__select" [(ngModel)]="filtroStatus" (ngModelChange)="carregar(1)">
+        <option value="">Todos</option>
+        <option value="NOVO">Novo</option>
+        <option value="APROVADO">Aprovado</option>
+        <option value="REJEITADO">Rejeitado</option>
+        <option value="EM_PRODUCAO">Em produção</option>
+        <option value="PRONTO">Pronto</option>
+        <option value="EM_ENTREGA">Em entrega</option>
+        <option value="ENTREGUE">Entregue</option>
+        <option value="CANCELADO">Cancelado</option>
+      </select>
+    </div>
+  </div>
+
+  @if (erro) {
+    <p class="pedidos-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="pedidos-pagina__loading">Carregando...</p>
+  } @else if (pedidos.length === 0) {
+    <div class="pedidos-tabela-wrapper">
+      <table class="pedidos-tabela">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>CLIENTE</th>
+            <th>DATA</th>
+            <th>STATUS</th>
+            <th>VALOR</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="pedidos-tabela__vazio">
+            <td colspan="6">
+              <p class="pedidos-vazio__texto">Nenhum pedido encontrado.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="pedidos-tabela-wrapper">
+      <table class="pedidos-tabela">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>CLIENTE</th>
+            <th>DATA</th>
+            <th>STATUS</th>
+            <th>VALOR</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of pedidos; track p.id) {
+            <tr>
+              <td>#{{ p.id }}</td>
+              <td>{{ p.cliente_nome || '—' }}</td>
+              <td>{{ p.data_cadastro ? (p.data_cadastro | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+              <td>{{ statusLabel(p.status) }}</td>
+              <td>{{ formatarPreco(p.valor_total) }}</td>
+              <td class="pedidos-tabela__acoes">
+                @if (p.status === 'NOVO') {
+                  <button type="button" class="pedidos-tabela__link" (click)="abrirEditar(p)">Editar</button>
+                  @if (isGerente) {
+                    <button type="button" class="pedidos-tabela__btn-aprovar" (click)="aprovar(p)">Aprovar</button>
+                    <button type="button" class="pedidos-tabela__btn-rejeitar" (click)="rejeitar(p)">Rejeitar</button>
+                  }
+                }
+                @if (p.status === 'NOVO' || p.status === 'REJEITADO') {
+                  <button type="button" class="pedidos-tabela__btn-excluir" (click)="excluir(p)">Excluir</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!carregando && total > 0) {
+    <nav class="pedidos-pagina__paginacao" aria-label="Paginação">
+      <button type="button" class="pedidos-pagina__btn-pag" (click)="carregar(paginaAtual - 1)" [disabled]="paginaAtual <= 1">Anterior</button>
+      <span class="pedidos-pagina__info-pag">Página {{ paginaAtual }} de {{ ultimaPagina }} ({{ total }} itens)</span>
+      <button type="button" class="pedidos-pagina__btn-pag" (click)="carregar(paginaAtual + 1)" [disabled]="paginaAtual >= ultimaPagina">Próxima</button>
+    </nav>
+  }
+</div>
+
+<app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
+  <div class="pedido-form-modal">
+    @if (formErro) {
+      <p class="pedido-form-modal__erro">{{ formErro }}</p>
+    }
+    <form (ngSubmit)="salvar()">
+      <div class="pedido-form-grupo">
+        <label for="cliente">Cliente <span class="obrigatorio">*</span></label>
+        <select id="cliente" [(ngModel)]="formClienteId" name="cliente" required>
+          <option [ngValue]="null">Selecione...</option>
+          @for (c of clientes; track c.id) {
+            <option [ngValue]="c.id">{{ c.nome }} ({{ c.tipo_cliente }})</option>
+          }
+        </select>
+      </div>
+      <div class="pedido-form-grupo">
+        <label>Itens do pedido</label>
+        @for (item of formItens; track $index) {
+          <div class="pedido-form-linha-item">
+            <select [(ngModel)]="item.Produto_id" name="produto_{{ $index }}">
+              <option [ngValue]="0">Selecione o produto</option>
+              @for (prod of produtos; track prod.id) {
+                <option [ngValue]="prod.id">{{ prod.nome }}</option>
+              }
+            </select>
+            <input type="number" [(ngModel)]="item.quantidade" name="qtd_{{ $index }}" min="1" placeholder="Qtd" />
+            <button type="button" class="pedido-form-btn-remover" (click)="removerItem($index)">Remover</button>
+          </div>
+        }
+        <button type="button" class="pedido-form-btn-add" (click)="adicionarItem()">+ Adicionar item</button>
+      </div>
+      <div class="pedido-form-grupo">
+        <label for="observacao">Observação</label>
+        <textarea id="observacao" [(ngModel)]="formObservacao" name="observacao" rows="2"></textarea>
+      </div>
+      <div class="pedido-form-modal__acoes">
+        <button type="button" class="pedido-form-modal__btn-cancelar" (click)="fecharModal()">Cancelar</button>
+        <button type="submit" class="pedido-form-modal__btn-criar" [disabled]="enviando">
+          {{ enviando ? 'Salvando...' : (modalEdicao ? 'Salvar' : 'Criar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>

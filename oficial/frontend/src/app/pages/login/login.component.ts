@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,20 +13,29 @@ import { NavbarComponent } from '../../shared/navbar/navbar.component';
 export class LoginComponent {
   login: string = '';
   senha: string = '';
+  carregando = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   onBotaoClicado(): void {
-    if (this.login.trim() !== '' && this.senha.trim() !== '') {
-      if (this.login === 'admin' && this.senha === 'admin') {
-        this.router.navigate(['/pessoa']);
-      }
-      else {
-        alert('Login ou senha incorretos.');
-      }
-    }
-    else {
+    if (this.login.trim() === '' || this.senha.trim() === '') {
       alert('Por favor, preencha todos os campos.');
+      return;
     }
+
+    this.carregando = true;
+    this.authService.login(this.login.trim(), this.senha).subscribe({
+      next: () => {
+        this.carregando = false;
+        this.router.navigate(['/painel']);
+      },
+      error: () => {
+        this.carregando = false;
+        alert('Login ou senha incorretos.');
+      },
+    });
   }
 }
