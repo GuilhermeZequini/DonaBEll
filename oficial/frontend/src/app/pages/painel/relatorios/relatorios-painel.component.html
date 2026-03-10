@@ -1,0 +1,402 @@
+<div class="relatorios-pagina">
+  <header class="relatorios-pagina__header">
+    <div>
+      <h1 class="relatorios-pagina__titulo">Relatórios</h1>
+      <p class="relatorios-pagina__subtitulo">Análises e indicadores do negócio</p>
+    </div>
+    <div class="relatorios-pagina__filtros">
+      <div class="relatorios-pagina__filtro">
+        <label for="ano">Ano</label>
+        <select id="ano" class="relatorios-pagina__select" [(ngModel)]="ano" (ngModelChange)="carregar()">
+          @for (a of anosDisponiveis(); track a) {
+            <option [ngValue]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+      <div class="relatorios-pagina__filtro">
+        <label for="mes">Mês</label>
+        <select id="mes" class="relatorios-pagina__select" [(ngModel)]="mes" (ngModelChange)="carregar()">
+          @for (m of meses; track m.valor ?? 'todos') {
+            <option [ngValue]="m.valor">{{ m.label }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="relatorios-pagina__btn" (click)="carregar()">Atualizar</button>
+    </div>
+  </header>
+
+  @if (erro) {
+    <p class="relatorios-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="relatorios-pagina__loading">Carregando relatórios...</p>
+  } @else if (dados) {
+    <div class="relatorios-grid">
+      <!-- Clientes que mais pediram -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Clientes que mais pediram</h2>
+        <p class="relatorio-card__desc">Top clientes por quantidade de pedidos</p>
+        @if (dados.clientes_mais_pedidos.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (c of dados.clientes_mais_pedidos; track c.cliente_id) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ c.cliente_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(c.total_pedidos / maxClientesPedidos()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ c.total_pedidos }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Pedidos</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of dados.clientes_mais_pedidos; track c.cliente_id) {
+                <tr>
+                  <td>{{ c.cliente_nome }}</td>
+                  <td>{{ c.total_pedidos }}</td>
+                  <td>{{ formatarPreco(c.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Produtos mais vendidos -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Produtos mais vendidos</h2>
+        <p class="relatorio-card__desc">Top produtos por quantidade vendida</p>
+        @if (dados.produtos_mais_vendidos.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (p of dados.produtos_mais_vendidos; track p.produto_id) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ p.produto_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(p.quantidade_total / maxProdutosVendidos()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ p.quantidade_total }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of dados.produtos_mais_vendidos; track p.produto_id) {
+                <tr>
+                  <td>{{ p.produto_nome }}</td>
+                  <td>{{ p.quantidade_total }}</td>
+                  <td>{{ formatarPreco(p.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Meses mais produtivos -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Meses mais produtivos</h2>
+        <p class="relatorio-card__desc">Ordenados por faturamento no ano</p>
+        @if (dados.meses_mais_produtivos.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (m of dados.meses_mais_produtivos; track m.mes) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ m.mes_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(m.valor_total / maxMesesProdutivos()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ formatarPreco(m.valor_total) }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th>Pedidos</th>
+                <th>Faturamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of dados.meses_mais_produtivos; track m.mes) {
+                <tr>
+                  <td>{{ m.mes_nome }}</td>
+                  <td>{{ m.total_pedidos }}</td>
+                  <td>{{ formatarPreco(m.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Faturamento por mês -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Faturamento por mês</h2>
+        <p class="relatorio-card__desc">Receita mensal do ano</p>
+        @if (dados.faturamento_por_mes.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (m of dados.faturamento_por_mes; track m.mes) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ m.mes_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(m.valor_total / maxFaturamentoPorMes()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ formatarPreco(m.valor_total) }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th>Pedidos</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of dados.faturamento_por_mes; track m.mes) {
+                <tr>
+                  <td>{{ m.mes_nome }}</td>
+                  <td>{{ m.total_pedidos }}</td>
+                  <td>{{ formatarPreco(m.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Produtos por mês -->
+      <section class="relatorio-card relatorio-card--wide">
+        <h2 class="relatorio-card__titulo">Produtos vendidos por mês</h2>
+        <p class="relatorio-card__desc">Quantidade de cada produto vendida em cada mês</p>
+        @if (dados.produtos_por_mes.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          @for (bloco of dados.produtos_por_mes; track bloco.mes) {
+            <div class="relatorio-mes">
+              <h3 class="relatorio-mes__titulo">{{ bloco.mes_nome }}</h3>
+              <table class="relatorio-tabela">
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of bloco.produtos; track p.produto_id) {
+                    <tr>
+                      <td>{{ p.produto_nome }}</td>
+                      <td>{{ p.quantidade }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </section>
+
+      <!-- Rotas com mais pedidos -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Rotas com mais pedidos</h2>
+        <p class="relatorio-card__desc">Distribuição por rota de entrega</p>
+        @if (dados.rotas_mais_pedidos.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (r of dados.rotas_mais_pedidos; track r.rota_id ?? r.rota_nome) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ r.rota_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(r.total_pedidos / maxRotasPedidos()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ r.total_pedidos }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Rota</th>
+                <th>Pedidos</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of dados.rotas_mais_pedidos; track r.rota_id ?? r.rota_nome) {
+                <tr>
+                  <td>{{ r.rota_nome }}</td>
+                  <td>{{ r.total_pedidos }}</td>
+                  <td>{{ formatarPreco(r.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Vendedores com mais vendas -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Vendedores com mais vendas</h2>
+        <p class="relatorio-card__desc">Ranking por faturamento gerado</p>
+        @if (dados.vendedores_mais_vendas.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (v of dados.vendedores_mais_vendas; track v.usuario_id) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ v.usuario_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(v.valor_total / maxVendedoresVendas()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ formatarPreco(v.valor_total) }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Vendedor</th>
+                <th>Pedidos</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of dados.vendedores_mais_vendas; track v.usuario_id) {
+                <tr>
+                  <td>{{ v.usuario_nome }}</td>
+                  <td>{{ v.total_pedidos }}</td>
+                  <td>{{ formatarPreco(v.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Pedidos por status -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Pedidos por status</h2>
+        <p class="relatorio-card__desc">Distribuição dos pedidos</p>
+        @if (dados.pedidos_por_status.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (s of dados.pedidos_por_status; track s.status) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ statusLabel(s.status) }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(s.total / maxPedidosPorStatus()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ s.total }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of dados.pedidos_por_status; track s.status) {
+                <tr>
+                  <td>{{ statusLabel(s.status) }}</td>
+                  <td>{{ s.total }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+
+      <!-- Faturamento por cliente -->
+      <section class="relatorio-card">
+        <h2 class="relatorio-card__titulo">Faturamento por cliente</h2>
+        <p class="relatorio-card__desc">Top clientes por valor gerado</p>
+        @if (dados.faturamento_por_cliente.length === 0) {
+          <p class="relatorio-card__vazio">Nenhum dado no período</p>
+        } @else {
+          <div class="relatorio-grafico">
+            @for (c of dados.faturamento_por_cliente; track c.cliente_id) {
+              <div class="relatorio-grafico__linha">
+                <span class="relatorio-grafico__label">{{ c.cliente_nome }}</span>
+                <div class="relatorio-grafico__bar-container">
+                  <div
+                    class="relatorio-grafico__bar"
+                    [style.width.%]="(c.valor_total / maxFaturamentoPorCliente()) * 100"
+                  ></div>
+                </div>
+                <span class="relatorio-grafico__valor">{{ formatarPreco(c.valor_total) }}</span>
+              </div>
+            }
+          </div>
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Pedidos</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of dados.faturamento_por_cliente; track c.cliente_id) {
+                <tr>
+                  <td>{{ c.cliente_nome }}</td>
+                  <td>{{ c.total_pedidos }}</td>
+                  <td>{{ formatarPreco(c.valor_total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    </div>
+  }
+</div>

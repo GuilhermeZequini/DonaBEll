@@ -94,10 +94,30 @@
   text-transform: uppercase;
 }
 
+.pedidos-tabela__linha {
+  cursor: pointer;
+}
+
+.pedidos-tabela__linha:hover td {
+  background: #f9fafb;
+}
+
+.pedidos-tabela__linha--expandida td {
+  background: #fff7ed;
+}
+
 .pedidos-tabela__acoes {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+  align-items: center;
+  min-height: 28px;
+}
+
+.pedidos-tabela__acoes:empty::after {
+  content: '—';
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 .pedidos-tabela__link,
@@ -139,6 +159,115 @@
   padding: 2rem;
   text-align: center;
   color: #6b7280;
+}
+
+.pedidos-detalhes-row td {
+  padding: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pedidos-detalhes {
+  padding: 1rem 1rem 1.1rem;
+  background: #fff;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.pedidos-detalhes__cabecalho {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pedidos-detalhes__titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+
+.pedidos-detalhes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pedidos-detalhes__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pedidos-detalhes__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.pedidos-detalhes__valor {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.pedidos-detalhes__observacao {
+  margin: 0 0 0.75rem 0;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.pedidos-detalhes__texto {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: #374151;
+  white-space: pre-wrap;
+}
+
+.pedidos-detalhes__subtitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.pedidos-detalhes__vazio {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.pedidos-detalhes-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pedidos-detalhes-tabela th,
+.pedidos-detalhes-tabela td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.pedidos-detalhes-tabela th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.pedidos-detalhes-tabela tr:last-child td {
+  border-bottom: none;
 }
 
 .pedidos-pagina__paginacao {

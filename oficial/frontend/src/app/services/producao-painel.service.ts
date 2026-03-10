@@ -9,6 +9,7 @@ export interface PedidoProducaoResumo {
   cliente_nome: string | null;
   status: string;
   valor_total: number;
+  data_cadastro: string | null;
   itens: { produto_nome: string | null; quantidade: number }[];
 }
 

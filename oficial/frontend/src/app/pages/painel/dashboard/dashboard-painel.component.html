@@ -1,0 +1,135 @@
+<div class="dashboard-pagina">
+  <header class="dashboard-pagina__header">
+    <div class="dashboard-pagina__titulo-area">
+      @if (usuario) {
+        <h1 class="dashboard-pagina__titulo">Dashboard</h1>
+        <p class="dashboard-pagina__subtitulo">
+          Pedidos por rota e semana — Bem-vindo, {{ usuario.nome }}
+        </p>
+      } @else {
+        <h1 class="dashboard-pagina__titulo">Dashboard</h1>
+        <p class="dashboard-pagina__subtitulo">Pedidos por rota e semana</p>
+      }
+    </div>
+    <div class="dashboard-pagina__filtros">
+      <div class="dashboard-pagina__filtro dashboard-pagina__filtro--modo">
+        <label>Visualização</label>
+        <div class="dashboard-pagina__modo-opcoes">
+          <label class="dashboard-pagina__modo-opcao">
+            <input type="radio" name="modo" [value]="'por_semana'" [(ngModel)]="modoVisualizacao">
+            <span>Todos da semana</span>
+          </label>
+          <label class="dashboard-pagina__modo-opcao">
+            <input type="radio" name="modo" [value]="'por_rota'" [(ngModel)]="modoVisualizacao">
+            <span>Por rota</span>
+          </label>
+        </div>
+      </div>
+      <div class="dashboard-pagina__filtro">
+        <label for="ano">Ano</label>
+        <select id="ano" class="dashboard-pagina__select" [(ngModel)]="ano" (ngModelChange)="carregar()">
+          @for (a of anosDisponiveis(); track a) {
+            <option [ngValue]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+      <div class="dashboard-pagina__filtro">
+        <label for="mes">Mês</label>
+        <select id="mes" class="dashboard-pagina__select" [(ngModel)]="mes" (ngModelChange)="carregar()">
+          @for (m of meses; track m.valor ?? 'todos') {
+            <option [ngValue]="m.valor">{{ m.label }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="dashboard-pagina__btn-atualizar" (click)="carregar()">
+        Atualizar
+      </button>
+    </div>
+  </header>
+
+  @if (erro) {
+    <p class="dashboard-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="dashboard-pagina__loading">Carregando...</p>
+  } @else if (porRota.length === 0) {
+    <div class="dashboard-pagina__vazio">
+      <p>Nenhum pedido encontrado para o período selecionado.</p>
+    </div>
+  } @else {
+    @if (modoVisualizacao === 'por_semana') {
+      <div class="dashboard-semanas">
+        @for (semana of porSemanas; track semana.semana_inicio) {
+          <section class="dashboard-semana-bloco">
+            <h2 class="dashboard-semana-bloco__titulo">{{ semana.label }}</h2>
+            <p class="dashboard-semana-bloco__periodo">Domingo a sábado — todos os pedidos da semana</p>
+            <div class="dashboard-pedidos">
+              @for (ped of semana.pedidos; track ped.id) {
+                <div class="dashboard-card">
+                  <div class="dashboard-card__linha">
+                    <strong class="dashboard-card__id">#{{ ped.id }}</strong>
+                    <span class="dashboard-card__cliente">{{ ped.cliente_nome || 'Cliente' }}</span>
+                    @if (ped.rota_nome) {
+                      <span class="dashboard-card__rota">{{ ped.rota_nome }}</span>
+                    }
+                  </div>
+                  <div class="dashboard-card__meta">
+                    <span class="dashboard-card__data" title="Data do pedido">
+                      Pedido em {{ formatarData(ped.data_cadastro) }}
+                    </span>
+                    <span class="dashboard-card__status">{{ statusLabel(ped.status) }}</span>
+                  </div>
+                  <div class="dashboard-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
+                  <ul class="dashboard-card__itens">
+                    @for (item of (ped.itens ?? []); track $index) {
+                      <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
+      <div class="dashboard-rotas">
+        @for (bloco of porRota; track bloco.rota?.id ?? bloco.rota?.nome ?? $index) {
+          <section class="dashboard-rota">
+            <h2 class="dashboard-rota__titulo">{{ bloco.rota?.nome ?? 'Rota' }}</h2>
+
+            @for (semana of bloco.semanas; track semana.semana_inicio) {
+              <div class="dashboard-semana">
+                <h3 class="dashboard-semana__titulo">{{ semana.label }}</h3>
+                <p class="dashboard-semana__periodo">Domingo a sábado</p>
+
+                <div class="dashboard-pedidos">
+                  @for (ped of semana.pedidos; track ped.id) {
+                    <div class="dashboard-card">
+                      <div class="dashboard-card__linha">
+                        <strong class="dashboard-card__id">#{{ ped.id }}</strong>
+                        <span class="dashboard-card__cliente">{{ ped.cliente_nome || 'Cliente' }}</span>
+                      </div>
+                      <div class="dashboard-card__meta">
+                        <span class="dashboard-card__data" title="Data do pedido">
+                          Pedido em {{ formatarData(ped.data_cadastro) }}
+                        </span>
+                        <span class="dashboard-card__status">{{ statusLabel(ped.status) }}</span>
+                      </div>
+                      <div class="dashboard-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
+                      <ul class="dashboard-card__itens">
+                        @for (item of (ped.itens ?? []); track $index) {
+                          <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </section>
+        }
+      </div>
+    }
+  }
+</div>

@@ -67,7 +67,7 @@
         </thead>
         <tbody>
           @for (p of pedidos; track p.id) {
-            <tr>
+            <tr class="pedidos-tabela__linha" [class.pedidos-tabela__linha--expandida]="detalhesAbertos(p.id)" (click)="alternarDetalhes(p.id)">
               <td>#{{ p.id }}</td>
               <td>{{ p.cliente_nome || '—' }}</td>
               <td>{{ p.data_cadastro ? (p.data_cadastro | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
@@ -75,17 +75,90 @@
               <td>{{ formatarPreco(p.valor_total) }}</td>
               <td class="pedidos-tabela__acoes">
                 @if (p.status === 'NOVO') {
-                  <button type="button" class="pedidos-tabela__link" (click)="abrirEditar(p)">Editar</button>
+                  <button type="button" class="pedidos-tabela__link" (click)="$event.stopPropagation(); abrirEditar(p)">Editar</button>
                   @if (isGerente) {
-                    <button type="button" class="pedidos-tabela__btn-aprovar" (click)="aprovar(p)">Aprovar</button>
-                    <button type="button" class="pedidos-tabela__btn-rejeitar" (click)="rejeitar(p)">Rejeitar</button>
+                    <button type="button" class="pedidos-tabela__btn-aprovar" (click)="$event.stopPropagation(); aprovar(p)">Aprovar</button>
+                    <button type="button" class="pedidos-tabela__btn-rejeitar" (click)="$event.stopPropagation(); rejeitar(p)">Rejeitar</button>
                   }
                 }
                 @if (p.status === 'NOVO' || p.status === 'REJEITADO') {
-                  <button type="button" class="pedidos-tabela__btn-excluir" (click)="excluir(p)">Excluir</button>
+                  <button type="button" class="pedidos-tabela__btn-excluir" (click)="$event.stopPropagation(); excluir(p)">Excluir</button>
                 }
               </td>
             </tr>
+            @if (detalhesAbertos(p.id)) {
+              <tr class="pedidos-detalhes-row">
+                <td colspan="6">
+                  <div class="pedidos-detalhes">
+                    <div class="pedidos-detalhes__cabecalho">
+                      <div class="pedidos-detalhes__titulo">Detalhes do pedido #{{ p.id }}</div>
+                    </div>
+
+                    <div class="pedidos-detalhes__grid">
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Cliente</span>
+                        <span class="pedidos-detalhes__valor">{{ p.cliente_nome || '—' }}</span>
+                      </div>
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Data</span>
+                        <span class="pedidos-detalhes__valor">{{ p.data_cadastro ? (p.data_cadastro | date:'dd/MM/yyyy HH:mm') : '—' }}</span>
+                      </div>
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Status</span>
+                        <span class="pedidos-detalhes__valor">{{ statusLabel(p.status) }}</span>
+                      </div>
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Valor total</span>
+                        <span class="pedidos-detalhes__valor">{{ formatarPreco(p.valor_total) }}</span>
+                      </div>
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Rota</span>
+                        <span class="pedidos-detalhes__valor">{{ p.rota_nome || '—' }}</span>
+                      </div>
+                      <div class="pedidos-detalhes__item">
+                        <span class="pedidos-detalhes__label">Vendedor</span>
+                        <span class="pedidos-detalhes__valor">{{ p.vendedor_nome || '—' }}</span>
+                      </div>
+                    </div>
+
+                    @if (p.observacao) {
+                      <div class="pedidos-detalhes__observacao">
+                        <span class="pedidos-detalhes__label">Observação</span>
+                        <p class="pedidos-detalhes__texto">{{ p.observacao }}</p>
+                      </div>
+                    }
+
+                    <div class="pedidos-detalhes__itens">
+                      <div class="pedidos-detalhes__subtitulo">Itens</div>
+                      @if (!p.itens || p.itens.length === 0) {
+                        <p class="pedidos-detalhes__vazio">Nenhum item.</p>
+                      } @else {
+                        <table class="pedidos-detalhes-tabela">
+                          <thead>
+                            <tr>
+                              <th>Produto</th>
+                              <th>Qtd</th>
+                              <th>Preço unit.</th>
+                              <th>Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (i of p.itens; track i.id ?? (i.Produto_id ?? $index)) {
+                              <tr>
+                                <td>{{ i.produto_nome || nomeProduto(i.Produto_id) }}</td>
+                                <td>{{ i.quantidade }}</td>
+                                <td>{{ formatarPreco(i.preco_unitario || 0) }}</td>
+                                <td>{{ formatarPreco((i.preco_unitario || 0) * (i.quantidade || 0)) }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>

@@ -33,6 +33,8 @@ export class PedidosListagemComponent implements OnInit {
   ultimaPagina = 1;
   total = 0;
   filtroStatus = '';
+  /** Permite abrir vários pedidos ao mesmo tempo. */
+  pedidosExpandidos = new Set<number>();
 
   clientes: ClientePainel[] = [];
   produtos: ProdutoPainel[] = [];
@@ -79,6 +81,15 @@ export class PedidosListagemComponent implements OnInit {
         this.carregando = false;
       },
     });
+  }
+
+  alternarDetalhes(pedidoId: number): void {
+    if (this.pedidosExpandidos.has(pedidoId)) this.pedidosExpandidos.delete(pedidoId);
+    else this.pedidosExpandidos.add(pedidoId);
+  }
+
+  detalhesAbertos(pedidoId: number): boolean {
+    return this.pedidosExpandidos.has(pedidoId);
   }
 
   abrirNovo(): void {

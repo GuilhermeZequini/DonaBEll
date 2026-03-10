@@ -49,11 +49,11 @@ class ProducaoController extends Controller
             $porRota[$rotaId]['pedidos'][] = $this->formatPedidoResumo($pedido);
         }
 
-        // Ordenar por ordem_prioridade e devolver array de colunas
+        // Ordenar por ordem_prioridade e devolver apenas rotas que têm pedidos
         $rotasOrdenadas = $rotas->map(fn ($r) => $r->id)->all();
         $resultado = [];
         foreach ($rotasOrdenadas as $rid) {
-            if (isset($porRota[$rid])) {
+            if (isset($porRota[$rid]) && !empty($porRota[$rid]['pedidos'])) {
                 $resultado[] = $porRota[$rid];
             }
         }
@@ -166,6 +166,7 @@ class ProducaoController extends Controller
             'cliente_nome' => $cliente && $cliente->usuario ? $cliente->usuario->nome : null,
             'status' => $p->status,
             'valor_total' => (float) $p->valor_total,
+            'data_cadastro' => $p->data_cadastro ? $p->data_cadastro->format('Y-m-d H:i:s') : null,
             'itens' => $itens,
         ];
     }

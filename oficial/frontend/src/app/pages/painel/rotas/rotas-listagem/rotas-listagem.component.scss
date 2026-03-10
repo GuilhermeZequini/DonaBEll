@@ -95,43 +95,90 @@
   color: #6b7280;
 }
 
+/* célula ordem: sem flex no td para a linha da linha não subir */
+.rotas-tabela td.rotas-tabela__ordem {
+  vertical-align: middle;
+}
+
+.rotas-tabela__ordem-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 3.5rem;
+  white-space: nowrap;
+}
+
+.rotas-tabela__ordem-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.rotas-tabela__ordem-icon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.rotas-tabela__status {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.rotas-tabela__status--ativa {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.rotas-tabela__status--inativa {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
 .rotas-tabela__acoes {
   display: flex;
   gap: 0.5rem;
 }
 
-.rotas-tabela__link {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #dc2626;
-  background-color: rgba(220, 38, 38, 0.08);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  border-radius: 9999px;
+.rotas-tabela__btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
-.rotas-tabela__link:hover {
-  background-color: rgba(220, 38, 38, 0.15);
-  border-color: #dc2626;
+.rotas-tabela__btn-icon:hover {
+  opacity: 0.9;
+}
+
+.rotas-tabela__btn-editar {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.rotas-tabela__btn-editar:hover {
+  background-color: #bfdbfe;
 }
 
 .rotas-tabela__btn-excluir {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #991b1b;
-  background-color: rgba(153, 27, 27, 0.08);
-  border: 1px solid rgba(153, 27, 27, 0.3);
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .rotas-tabela__btn-excluir:hover {
-  background-color: rgba(153, 27, 27, 0.15);
-  border-color: #991b1b;
+  background-color: #fecaca;
 }
 
 /* Modal form */

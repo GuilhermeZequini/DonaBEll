@@ -1,0 +1,264 @@
+.dashboard-pagina {
+  width: 100%;
+  max-width: none;
+}
+
+.dashboard-pagina__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-pagina__titulo-area {
+  flex: 1;
+  min-width: 200px;
+}
+
+.dashboard-pagina__titulo {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.dashboard-pagina__subtitulo {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.dashboard-pagina__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.dashboard-pagina__filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+}
+
+.dashboard-pagina__select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  min-width: 120px;
+}
+
+.dashboard-pagina__btn-atualizar {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  background: #dc2626;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dashboard-pagina__btn-atualizar:hover {
+  background: #b91c1c;
+}
+
+.dashboard-pagina__filtro--modo {
+  min-width: 180px;
+}
+
+.dashboard-pagina__modo-opcoes {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-pagina__modo-opcao {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+
+  input {
+    cursor: pointer;
+  }
+}
+
+.dashboard-semanas {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-semana-bloco {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.dashboard-semana-bloco__titulo {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.dashboard-semana-bloco__periodo {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dashboard-card__rota {
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: rgba(107, 114, 128, 0.1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.dashboard-pagina__erro {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.dashboard-pagina__loading {
+  color: #6b7280;
+  margin: 1rem 0;
+}
+
+.dashboard-pagina__vazio {
+  padding: 2rem;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  color: #6b7280;
+}
+
+.dashboard-rotas {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-rota {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dashboard-rota__titulo {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.dashboard-semana {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.dashboard-semana__titulo {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.dashboard-semana__periodo {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dashboard-pedidos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.dashboard-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.dashboard-card__linha {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.dashboard-card__id {
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.dashboard-card__cliente {
+  font-size: 0.9rem;
+  color: #111;
+}
+
+.dashboard-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.dashboard-card__data {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.dashboard-card__status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  background: rgba(55, 65, 81, 0.1);
+  color: #374151;
+  border-radius: 4px;
+}
+
+.dashboard-card__valor {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card__itens {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+}

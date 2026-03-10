@@ -7,6 +7,8 @@ use App\Http\Controllers\RotaController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProducaoController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RelatoriosController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('pedidos/{id}/aprovar', [PedidoController::class, 'aprovar']);
     Route::post('pedidos/{id}/rejeitar', [PedidoController::class, 'rejeitar']);
 
+    Route::get('dashboard', [DashboardController::class, 'index']);
+    Route::get('relatorios', [RelatoriosController::class, 'index']);
     Route::get('producao', [ProducaoController::class, 'index']);
     Route::get('producao/consolidacao', [ProducaoController::class, 'consolidacao']);
     Route::put('producao/pedidos/{pedido}/status', [ProducaoController::class, 'atualizarStatus']);

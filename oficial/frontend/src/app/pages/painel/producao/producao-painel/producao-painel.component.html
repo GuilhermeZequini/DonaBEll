@@ -34,8 +34,10 @@
                 <div class="producao-card__cabecalho">
                   <strong>#{{ ped.id }}</strong> {{ ped.cliente_nome || 'Cliente' }}
                 </div>
+                @if (ped.data_cadastro) {
+                  <p class="producao-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
+                }
                 <div class="producao-card__status">{{ statusLabel(ped.status) }}</div>
-                <div class="producao-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
                 <ul class="producao-card__itens">
                   @for (item of (ped.itens ?? []); track $index) {
                     <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>

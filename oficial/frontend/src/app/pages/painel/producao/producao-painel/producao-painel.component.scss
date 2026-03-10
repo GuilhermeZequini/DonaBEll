@@ -97,18 +97,17 @@
   margin-bottom: 0.25rem;
 }
 
+.producao-card__data {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
 .producao-card__status {
   font-size: 0.75rem;
   font-weight: 600;
   color: #6b7280;
   margin-bottom: 0.25rem;
-}
-
-.producao-card__valor {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 0.5rem;
 }
 
 .producao-card__itens {
