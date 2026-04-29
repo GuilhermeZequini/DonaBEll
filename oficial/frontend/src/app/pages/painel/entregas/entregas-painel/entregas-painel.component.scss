@@ -1,0 +1,246 @@
+.entregas-pagina {
+  width: 100%;
+  max-width: none;
+}
+
+.entregas-pagina__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.entregas-pagina__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.entregas-pagina__filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+  }
+}
+
+.entregas-pagina__select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  min-width: 120px;
+}
+
+.entregas-pagina__btn-atualizar {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  background: #0e7490;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.entregas-pagina__btn-atualizar:hover {
+  background: #0c6478;
+}
+
+.entregas-semana {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.entregas-semana__titulo {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.entregas-semana__periodo {
+  margin: 0 0 1rem 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.entregas-pagina__titulo {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.entregas-pagina__subtitulo {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.entregas-pagina__erro {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.entregas-pagina__loading {
+  color: #6b7280;
+  margin: 1rem 0;
+}
+
+.entregas-pagina__vazio {
+  padding: 2rem;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  color: #6b7280;
+}
+
+.entregas-colunas {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.entregas-coluna {
+  min-width: 300px;
+  max-width: 360px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.entregas-coluna__titulo {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #374151;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #0e7490;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.entregas-coluna__prioridade {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0e7490;
+  background: rgba(34, 211, 238, 0.15);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.entregas-card {
+  display: flex;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.entregas-card__ordem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.entregas-card__btn-ordem {
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0e7490;
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: rgba(34, 211, 238, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.entregas-card__num {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #374151;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.entregas-card__conteudo {
+  flex: 1;
+  min-width: 0;
+}
+
+.entregas-card__cabecalho {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.entregas-card__data {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.entregas-card__valor {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 0.35rem;
+}
+
+.entregas-card__itens {
+  margin: 0 0 0.5rem 0;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.entregas-card__btn-entregue {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: #16a34a;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.entregas-card__btn-entregue:hover {
+  background: #15803d;
+}

@@ -134,4 +134,18 @@ export class DashboardPainelComponent implements OnInit {
     };
     return labels[s] ?? s;
   }
+
+  statusBadgeClass(status: string): string {
+    const map: Record<string, string> = {
+      NOVO: 'status-badge--novo',
+      APROVADO: 'status-badge--aprovado',
+      REJEITADO: 'status-badge--rejeitado',
+      EM_PRODUCAO: 'status-badge--em-producao',
+      PRONTO: 'status-badge--pronto',
+      EM_ENTREGA: 'status-badge--em-entrega',
+      ENTREGUE: 'status-badge--entregue',
+      CANCELADO: 'status-badge--cancelado',
+    };
+    return `status-badge ${map[status] ?? 'status-badge--default'}`;
+  }
 }

@@ -155,19 +155,27 @@ class ProducaoController extends Controller
 
     private function formatPedidoResumo($p)
     {
+        // Para perfil PRODUCAO: não retornar nenhum valor monetário.
+        $ocultarValores = request()->user() && request()->user()->tipo_perfil === 'PRODUCAO';
+
         $cliente = $p->cliente ?? null;
         $itens = collect($p->itens ?? [])->map(fn ($i) => [
             'produto_nome' => $i->produto ? $i->produto->nome : null,
             'quantidade' => (int) $i->quantidade,
         ])->values()->all();
 
-        return [
+        $resumo = [
             'id' => $p->id,
             'cliente_nome' => $cliente && $cliente->usuario ? $cliente->usuario->nome : null,
             'status' => $p->status,
-            'valor_total' => (float) $p->valor_total,
             'data_cadastro' => $p->data_cadastro ? $p->data_cadastro->format('Y-m-d H:i:s') : null,
             'itens' => $itens,
         ];
+
+        if (!$ocultarValores) {
+            $resumo['valor_total'] = (float) $p->valor_total;
+        }
+
+        return $resumo;
     }
 }

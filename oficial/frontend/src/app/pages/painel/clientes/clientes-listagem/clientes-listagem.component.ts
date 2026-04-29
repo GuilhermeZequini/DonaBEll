@@ -176,7 +176,10 @@ export class ClientesListagemComponent implements OnInit {
     if (!confirm(`Excluir o cliente "${c.nome}"?`)) return;
     this.service.excluir(c.id).subscribe({
       next: () => this.carregar(),
-      error: () => alert('Não foi possível excluir o cliente.'),
+      error: (err) => {
+        const msg = err.error?.message || err.error?.error || 'Não foi possível excluir o cliente.';
+        alert(msg);
+      },
     });
   }
 

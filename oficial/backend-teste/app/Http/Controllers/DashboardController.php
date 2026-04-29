@@ -21,6 +21,16 @@ class DashboardController extends Controller
         $query = Pedido::with(['cliente.usuario', 'cliente.rota', 'itens.produto'])
             ->whereYear('data_cadastro', $ano);
 
+        // VENDEDOR vê apenas os próprios pedidos (criados por ele)
+        $usuario = $request->user();
+        if ($usuario && $usuario->tipo_perfil === 'VENDEDOR') {
+            $query->where('Usuario_id', $usuario->id);
+        }
+        // CLIENTE vê apenas os pedidos dele
+        if ($usuario && $usuario->tipo_perfil === 'CLIENTE') {
+            $query->where('Cliente_Usuario_id', $usuario->id);
+        }
+
         if ($mes !== null && $mes !== '') {
             $query->whereMonth('data_cadastro', (int) $mes);
         }

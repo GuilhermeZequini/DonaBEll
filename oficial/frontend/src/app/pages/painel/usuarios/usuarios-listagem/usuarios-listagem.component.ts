@@ -161,7 +161,10 @@ export class UsuariosListagemComponent implements OnInit {
     if (!confirm(`Excluir o usuário "${usuario.nome}"?`)) return;
     this.service.excluir(usuario.id).subscribe({
       next: () => this.carregar(),
-      error: () => alert('Não foi possível excluir o usuário.'),
+      error: (err) => {
+        const msg = err.error?.message || err.error?.error || 'Não foi possível excluir o usuário.';
+        alert(msg);
+      },
     });
   }
 }

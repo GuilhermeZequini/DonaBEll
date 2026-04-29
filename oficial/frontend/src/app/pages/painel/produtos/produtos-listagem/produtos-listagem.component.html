@@ -4,7 +4,9 @@
       <h1 class="produtos-pagina__titulo">Produtos</h1>
       <p class="produtos-pagina__subtitulo">Cadastro e gestão de produtos</p>
     </div>
-    <button type="button" class="produtos-pagina__btn-novo" (click)="abrirNovo()">+ Novo Produto</button>
+    @if (podeGerirProdutos) {
+      <button type="button" class="produtos-pagina__btn-novo" (click)="abrirNovo()">+ Novo Produto</button>
+    }
   </div>
 
   <div class="produtos-pagina__filtros">
@@ -33,12 +35,14 @@
             <th>PREÇO PF</th>
             <th>PREÇO PJ</th>
             <th>STATUS</th>
-            <th>AÇÕES</th>
+            @if (podeGerirProdutos) {
+              <th>AÇÕES</th>
+            }
           </tr>
         </thead>
         <tbody>
           <tr class="produtos-tabela__vazio">
-            <td colspan="5">
+            <td [attr.colspan]="podeGerirProdutos ? 5 : 4">
               <div class="produtos-vazio">
                 <p class="produtos-vazio__texto">Nenhum produto encontrado.</p>
               </div>
@@ -56,7 +60,9 @@
             <th>PREÇO PF</th>
             <th>PREÇO PJ</th>
             <th>STATUS</th>
-            <th>AÇÕES</th>
+            @if (podeGerirProdutos) {
+              <th>AÇÕES</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -66,10 +72,12 @@
               <td>{{ formatarPreco(p.preco_pf) }}</td>
               <td>{{ formatarPreco(p.preco_pj) }}</td>
               <td>{{ p.ativo ? 'Ativo' : 'Inativo' }}</td>
-              <td class="produtos-tabela__acoes">
-                <button type="button" class="produtos-tabela__link" (click)="abrirEditar(p)">Editar</button>
-                <button type="button" class="produtos-tabela__btn-excluir" (click)="excluir(p)">Excluir</button>
-              </td>
+              @if (podeGerirProdutos) {
+                <td class="produtos-tabela__acoes">
+                  <button type="button" class="produtos-tabela__link" (click)="abrirEditar(p)">Editar</button>
+                  <button type="button" class="produtos-tabela__btn-excluir" (click)="excluir(p)">Excluir</button>
+                </td>
+              }
             </tr>
           }
         </tbody>
@@ -86,7 +94,8 @@
   }
 </div>
 
-<app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
+@if (podeGerirProdutos) {
+  <app-modal [aberto]="modalAberto" [titulo]="modalTitulo" (fechar)="fecharModal()">
   <div class="produto-form-modal">
     @if (formErro) {
       <p class="produto-form-modal__erro">{{ formErro }}</p>
@@ -131,3 +140,4 @@
     </form>
   </div>
 </app-modal>
+}

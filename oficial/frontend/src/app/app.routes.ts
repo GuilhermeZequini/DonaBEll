@@ -13,9 +13,12 @@ import { RotasListagemComponent } from './pages/painel/rotas/rotas-listagem/rota
 import { ProdutosListagemComponent } from './pages/painel/produtos/produtos-listagem/produtos-listagem.component';
 import { PedidosListagemComponent } from './pages/painel/pedidos/pedidos-listagem/pedidos-listagem.component';
 import { ProducaoPainelComponent } from './pages/painel/producao/producao-painel/producao-painel.component';
+import { EntregasPainelComponent } from './pages/painel/entregas/entregas-painel/entregas-painel.component';
 import { RelatoriosPainelComponent } from './pages/painel/relatorios/relatorios-painel.component';
 import { authGuard } from './guards/auth.guard';
 import { gerenteGuard } from './guards/gerente.guard';
+import { notProducaoGuard } from './guards/not-producao.guard';
+import { entregasGuard } from './guards/entregas.guard';
 
 export const routes: Routes = [
     {
@@ -52,16 +55,17 @@ export const routes: Routes = [
       component: PainelComponent,
       canActivate: [authGuard],
       children: [
-        { path: '', component: DashboardPainelComponent, title: 'Dashboard' },
-        { path: 'pedidos', component: PedidosListagemComponent, title: 'Pedidos' },
+        { path: '', component: DashboardPainelComponent, title: 'Dashboard', canActivate: [notProducaoGuard] },
+        { path: 'pedidos', component: PedidosListagemComponent, title: 'Pedidos', canActivate: [notProducaoGuard] },
         { path: 'producao', component: ProducaoPainelComponent, title: 'Produção' },
+        { path: 'entregas', component: EntregasPainelComponent, title: 'Entregas', canActivate: [entregasGuard] },
         { path: 'rotas', component: RotasListagemComponent, title: 'Rotas', canActivate: [gerenteGuard] },
-        { path: 'produtos', component: ProdutosListagemComponent, title: 'Produtos' },
-        { path: 'clientes', component: ClientesListagemComponent, title: 'Clientes' },
+        { path: 'produtos', component: ProdutosListagemComponent, title: 'Produtos', canActivate: [notProducaoGuard] },
+        { path: 'clientes', component: ClientesListagemComponent, title: 'Clientes', canActivate: [notProducaoGuard] },
         { path: 'usuarios', component: UsuariosListagemComponent, title: 'Usuários', canActivate: [gerenteGuard] },
         { path: 'usuarios/novo', component: UsuarioFormComponent, title: 'Novo usuário', canActivate: [gerenteGuard] },
         { path: 'usuarios/editar/:id', component: UsuarioFormComponent, title: 'Editar usuário', canActivate: [gerenteGuard] },
-        { path: 'relatorios', component: RelatoriosPainelComponent, title: 'Relatórios' },
+        { path: 'relatorios', component: RelatoriosPainelComponent, title: 'Relatórios', canActivate: [gerenteGuard] },
       ]
     },
 ];

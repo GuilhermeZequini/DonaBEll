@@ -17,6 +17,7 @@ class Pedido extends Model
         'status',
         'observacao',
         'valor_total',
+        'ordem_entrega',
     ];
 
     protected $casts = [

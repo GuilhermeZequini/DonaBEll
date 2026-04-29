@@ -78,7 +78,7 @@
                     <span class="dashboard-card__data" title="Data do pedido">
                       Pedido em {{ formatarData(ped.data_cadastro) }}
                     </span>
-                    <span class="dashboard-card__status">{{ statusLabel(ped.status) }}</span>
+                    <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
                   </div>
                   <div class="dashboard-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
                   <ul class="dashboard-card__itens">
@@ -114,7 +114,7 @@
                         <span class="dashboard-card__data" title="Data do pedido">
                           Pedido em {{ formatarData(ped.data_cadastro) }}
                         </span>
-                        <span class="dashboard-card__status">{{ statusLabel(ped.status) }}</span>
+                        <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
                       </div>
                       <div class="dashboard-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
                       <ul class="dashboard-card__itens">

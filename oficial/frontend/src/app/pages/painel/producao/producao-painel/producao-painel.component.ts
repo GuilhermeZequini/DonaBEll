@@ -64,6 +64,15 @@ export class ProducaoPainelComponent implements OnInit {
     return labels[s] ?? s;
   }
 
+  statusBadgeClass(status: string): string {
+    const map: Record<string, string> = {
+      APROVADO: 'status-badge--aprovado',
+      EM_PRODUCAO: 'status-badge--em-producao',
+      PRONTO: 'status-badge--pronto',
+    };
+    return `status-badge ${map[status] ?? 'status-badge--default'}`;
+  }
+
   formatarPreco(valor: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }

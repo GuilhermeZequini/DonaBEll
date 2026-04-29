@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Cliente;
 use App\Models\Usuario;
 use App\Models\Rota;
+use App\Models\Pedido;
 
 class ClienteController extends Controller
 {
@@ -81,6 +82,7 @@ class ClienteController extends Controller
 
         $cliente = new Cliente();
         $cliente->Usuario_id = $usuario->id;
+        $cliente->nome = $request->nome;
         $cliente->tipo_cliente = $request->tipo_cliente;
         $cliente->CNPJ_CPF = $request->CNPJ_CPF;
         $cliente->telefone = $request->telefone;
@@ -115,7 +117,7 @@ class ClienteController extends Controller
         $request->validate([
             'nome' => 'sometimes|string|max:255',
             'tipo_cliente' => 'sometimes|in:PF,PJ',
-            'CNPJ_CPF' => 'sometimes|string|max:14|unique:cliente,CNPJ_CPF,' . $cliente->Usuario_id,
+            'CNPJ_CPF' => 'sometimes|string|max:14|unique:cliente,CNPJ_CPF,' . $cliente->Usuario_id . ',Usuario_id',
             'email' => 'nullable|email',
             'telefone' => 'nullable|string|max:20',
             'rua' => 'nullable|string|max:45',
@@ -130,7 +132,8 @@ class ClienteController extends Controller
             'ativo' => 'sometimes|boolean',
         ]);
 
-        // Atualiza dados do cliente (tabela cliente não tem coluna nome; nome fica em usuario)
+        // Atualiza dados do cliente (nome pode estar em cliente e/ou em usuario)
+        if ($request->has('nome')) $cliente->nome = $request->nome;
         if ($request->has('tipo_cliente')) $cliente->tipo_cliente = $request->tipo_cliente;
         if ($request->has('CNPJ_CPF')) $cliente->CNPJ_CPF = $request->CNPJ_CPF;
         if ($request->has('telefone')) $cliente->telefone = $request->telefone;
@@ -190,7 +193,13 @@ class ClienteController extends Controller
     {
         $cliente = Cliente::find($cliente);
         if (!$cliente) {
-            return response()->json(['error' => 'Cliente não encontrado'], 404);
+            return response()->json(['message' => 'Cliente não encontrado'], 404);
+        }
+
+        if (Pedido::where('Cliente_Usuario_id', $cliente->Usuario_id)->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir. Este cliente possui pedidos vinculados.',
+            ], 422);
         }
 
         // Remove o cliente

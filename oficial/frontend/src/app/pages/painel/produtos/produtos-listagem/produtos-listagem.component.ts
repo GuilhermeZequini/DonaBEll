@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProdutosPainelService, ProdutoPainel, ProdutoCreate } from '../../../../services/produtos-painel.service';
 import { ModalComponent } from '../../../../shared/modal/modal.component';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-produtos-listagem',
@@ -30,7 +31,16 @@ export class ProdutosListagemComponent implements OnInit {
   formPrecoPfDisplay = '';
   formPrecoPjDisplay = '';
 
-  constructor(private service: ProdutosPainelService) {}
+  private perfil: string | null = null;
+
+  constructor(
+    private service: ProdutosPainelService,
+    private authService: AuthService
+  ) {}
+
+  get podeGerirProdutos(): boolean {
+    return this.perfil === 'GERENTE';
+  }
 
   formVazio(): ProdutoCreate & { ativo?: boolean } {
     return {
@@ -74,6 +84,7 @@ export class ProdutosListagemComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.perfil = this.authService.getUsuario()?.tipo_perfil ?? null;
     this.carregar();
   }
 
@@ -99,6 +110,7 @@ export class ProdutosListagemComponent implements OnInit {
   }
 
   abrirNovo(): void {
+    if (!this.podeGerirProdutos) return;
     this.modalEdicao = null;
     this.form = this.formVazio();
     this.formPrecoPfDisplay = '';
@@ -108,6 +120,7 @@ export class ProdutosListagemComponent implements OnInit {
   }
 
   abrirEditar(p: ProdutoPainel): void {
+    if (!this.podeGerirProdutos) return;
     this.modalEdicao = p;
     this.form = {
       nome: p.nome,
@@ -131,6 +144,10 @@ export class ProdutosListagemComponent implements OnInit {
   }
 
   salvar(): void {
+    if (!this.podeGerirProdutos) {
+      this.formErro = 'Você não tem permissão para alterar produtos.';
+      return;
+    }
     this.formErro = null;
     if (!this.form.nome?.trim()) {
       this.formErro = 'Preencha o nome.';
@@ -180,6 +197,7 @@ export class ProdutosListagemComponent implements OnInit {
   }
 
   excluir(p: ProdutoPainel): void {
+    if (!this.podeGerirProdutos) return;
     if (!confirm(`Excluir o produto "${p.nome}"?`)) return;
     this.service.excluir(p.id).subscribe({
       next: () => this.carregar(),

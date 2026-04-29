@@ -6,6 +6,7 @@ export type IconeMenu =
   | 'dashboard'
   | 'pedidos'
   | 'producao'
+  | 'entregas'
   | 'rotas'
   | 'produtos'
   | 'clientes'

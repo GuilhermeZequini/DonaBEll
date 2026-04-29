@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
+use App\Models\Cliente;
+use App\Models\Pedido;
 
 class UsuarioController extends Controller
 {
@@ -91,7 +93,25 @@ class UsuarioController extends Controller
         $usuario = Usuario::find($id);
 
         if (!$usuario) {
-            return response()->json(['error' => 'Usuário não encontrado'], 404);
+            return response()->json(['message' => 'Usuário não encontrado'], 404);
+        }
+
+        if (Cliente::where('Usuario_id', $id)->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir. Este usuário está vinculado a um cliente. Exclua o cliente pela aba Clientes.',
+            ], 422);
+        }
+
+        if (Pedido::where('Usuario_id', $id)->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir. Este usuário possui pedidos registrados como vendedor.',
+            ], 422);
+        }
+
+        if (Pedido::where('Cliente_Usuario_id', $id)->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir. Este usuário (cliente) possui pedidos vinculados.',
+            ], 422);
         }
 
         $usuario->delete();

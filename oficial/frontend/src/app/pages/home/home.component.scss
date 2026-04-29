@@ -49,6 +49,12 @@ body {
   opacity: 0.95;
 }
 
+.banner-img {
+  max-width: 260px;
+  max-height: 180px;
+  object-fit: contain;
+}
+
 /* BOTÃO */
 .btn {
   display: inline-flex;
@@ -147,6 +153,11 @@ body {
   .banner .container {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .banner .banner-img {
+    order: -1;
+    margin: 0 auto;
   }
 
   .banner h1 {

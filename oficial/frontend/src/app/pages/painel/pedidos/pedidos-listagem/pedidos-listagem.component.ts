@@ -226,6 +226,20 @@ export class PedidosListagemComponent implements OnInit {
     return STATUS_LABELS[s] ?? s;
   }
 
+  statusBadgeClass(status: string): string {
+    const map: Record<string, string> = {
+      NOVO: 'status-badge--novo',
+      APROVADO: 'status-badge--aprovado',
+      REJEITADO: 'status-badge--rejeitado',
+      EM_PRODUCAO: 'status-badge--em-producao',
+      PRONTO: 'status-badge--pronto',
+      EM_ENTREGA: 'status-badge--em-entrega',
+      ENTREGUE: 'status-badge--entregue',
+      CANCELADO: 'status-badge--cancelado',
+    };
+    return `status-badge ${map[status] ?? 'status-badge--default'}`;
+  }
+
   formatarPreco(valor: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }

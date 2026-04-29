@@ -1,0 +1,107 @@
+<div class="entregas-pagina">
+  <div class="entregas-pagina__header">
+    <div>
+      <h1 class="entregas-pagina__titulo">Entregas</h1>
+      <p class="entregas-pagina__subtitulo">
+        Pedidos prontos com rota atribuída, por semana — reordene conforme a rota e marque como entregue
+      </p>
+    </div>
+    <div class="entregas-pagina__filtros">
+      <div class="entregas-pagina__filtro">
+        <label for="ano">Ano</label>
+        <select id="ano" class="entregas-pagina__select" [(ngModel)]="ano" (ngModelChange)="carregar()">
+          @for (a of anosDisponiveis(); track a) {
+            <option [ngValue]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+      <div class="entregas-pagina__filtro">
+        <label for="mes">Mês</label>
+        <select id="mes" class="entregas-pagina__select" [(ngModel)]="mes" (ngModelChange)="carregar()">
+          @for (m of meses; track m.valor ?? 'todos') {
+            <option [ngValue]="m.valor">{{ m.label }}</option>
+          }
+        </select>
+      </div>
+      <button type="button" class="entregas-pagina__btn-atualizar" (click)="carregar()">Atualizar</button>
+    </div>
+  </div>
+
+  @if (erro) {
+    <p class="entregas-pagina__erro">{{ erro }}</p>
+  }
+
+  @if (carregando) {
+    <p class="entregas-pagina__loading">Carregando...</p>
+  } @else if (porSemana.length === 0) {
+    <div class="entregas-pagina__vazio">
+      <p>Nenhum pedido pronto com rota atribuída para o período selecionado.</p>
+    </div>
+  } @else {
+    @for (semana of porSemana; track semana.semana_inicio) {
+      <section class="entregas-semana">
+        <h2 class="entregas-semana__titulo">{{ semana.label }}</h2>
+        <p class="entregas-semana__periodo">Domingo a sábado</p>
+        <div class="entregas-colunas">
+          @for (col of semana.por_rota; track col.rota?.id ?? $index) {
+            <div class="entregas-coluna">
+              <h3 class="entregas-coluna__titulo">
+                {{ col.rota?.nome ?? 'Rota' }}
+                <span class="entregas-coluna__prioridade">Prioridade {{ col.rota?.ordem_prioridade ?? 0 }}</span>
+              </h3>
+
+              @for (ped of col.pedidos; track ped.id; let i = $index) {
+                <div class="entregas-card">
+                  <div class="entregas-card__ordem">
+                    <button
+                      type="button"
+                      class="entregas-card__btn-ordem"
+                      (click)="moverParaCima(col, i)"
+                      [disabled]="i === 0"
+                      [attr.aria-label]="'Mover para cima'"
+                    >
+                      ↑
+                    </button>
+                    <span class="entregas-card__num">{{ i + 1 }}</span>
+                    <button
+                      type="button"
+                      class="entregas-card__btn-ordem"
+                      (click)="moverParaBaixo(col, i)"
+                      [disabled]="i === col.pedidos.length - 1"
+                      [attr.aria-label]="'Mover para baixo'"
+                    >
+                      ↓
+                    </button>
+                  </div>
+
+                  <div class="entregas-card__conteudo">
+                    <div class="entregas-card__cabecalho">
+                      <strong>#{{ ped.id }}</strong>
+                      {{ ped.cliente_nome || 'Cliente' }}
+                    </div>
+                    @if (ped.data_cadastro) {
+                      <p class="entregas-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
+                    }
+                    <div class="entregas-card__valor">{{ formatarPreco(ped.valor_total) }}</div>
+                    <ul class="entregas-card__itens">
+                      @for (item of (ped.itens ?? []); track $index) {
+                        <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                      }
+                    </ul>
+                    <button
+                      type="button"
+                      class="entregas-card__btn-entregue"
+                      (click)="marcarEntregue(ped.id)"
+                    >
+                      Marcar como entregue
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

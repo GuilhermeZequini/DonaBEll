@@ -4,14 +4,15 @@ import { AuthService, UsuarioLogado } from '../../services/auth.service';
 import { PainelSidebarComponent, ItemMenuPainel } from '../../shared/painel-sidebar/painel-sidebar.component';
 
 const MENU_PAINEL: ItemMenuPainel[] = [
-  { label: 'Dashboard', link: '/painel', icon: 'dashboard' },
-  { label: 'Pedidos', link: '/painel/pedidos', icon: 'pedidos' },
-  { label: 'Produção', link: '/painel/producao', icon: 'producao' },
+  { label: 'Dashboard', link: '/painel', icon: 'dashboard', roles: ['GERENTE', 'VENDEDOR', 'ENTREGADOR', 'CLIENTE'] },
+  { label: 'Pedidos', link: '/painel/pedidos', icon: 'pedidos', roles: ['GERENTE', 'VENDEDOR'] },
+  { label: 'Produção', link: '/painel/producao', icon: 'producao', roles: ['PRODUCAO', 'GERENTE'] },
+  { label: 'Entregas', link: '/painel/entregas', icon: 'entregas', roles: ['ENTREGADOR', 'GERENTE'] },
   { label: 'Rotas', link: '/painel/rotas', icon: 'rotas', roles: ['GERENTE'] },
-  { label: 'Produtos', link: '/painel/produtos', icon: 'produtos' },
-  { label: 'Clientes', link: '/painel/clientes', icon: 'clientes' },
+  { label: 'Produtos', link: '/painel/produtos', icon: 'produtos', roles: ['GERENTE', 'VENDEDOR'] },
+  { label: 'Clientes', link: '/painel/clientes', icon: 'clientes', roles: ['GERENTE', 'VENDEDOR'] },
   { label: 'Usuários', link: '/painel/usuarios', icon: 'usuarios', roles: ['GERENTE'] },
-  { label: 'Relatórios', link: '/painel/relatorios', icon: 'relatorios' },
+  { label: 'Relatórios', link: '/painel/relatorios', icon: 'relatorios', roles: ['GERENTE'] },
 ];
 
 @Component({

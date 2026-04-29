@@ -71,7 +71,9 @@
               <td>#{{ p.id }}</td>
               <td>{{ p.cliente_nome || '—' }}</td>
               <td>{{ p.data_cadastro ? (p.data_cadastro | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
-              <td>{{ statusLabel(p.status) }}</td>
+              <td>
+                <span [class]="statusBadgeClass(p.status)">{{ statusLabel(p.status) }}</span>
+              </td>
               <td>{{ formatarPreco(p.valor_total) }}</td>
               <td class="pedidos-tabela__acoes">
                 @if (p.status === 'NOVO') {
@@ -105,7 +107,9 @@
                       </div>
                       <div class="pedidos-detalhes__item">
                         <span class="pedidos-detalhes__label">Status</span>
-                        <span class="pedidos-detalhes__valor">{{ statusLabel(p.status) }}</span>
+                        <span class="pedidos-detalhes__valor">
+                          <span [class]="statusBadgeClass(p.status)">{{ statusLabel(p.status) }}</span>
+                        </span>
                       </div>
                       <div class="pedidos-detalhes__item">
                         <span class="pedidos-detalhes__label">Valor total</span>

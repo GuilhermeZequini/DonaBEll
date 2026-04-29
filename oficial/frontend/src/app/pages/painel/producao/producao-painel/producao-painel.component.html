@@ -37,7 +37,9 @@
                 @if (ped.data_cadastro) {
                   <p class="producao-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
                 }
-                <div class="producao-card__status">{{ statusLabel(ped.status) }}</div>
+                <div class="producao-card__status">
+                  <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
+                </div>
                 <ul class="producao-card__itens">
                   @for (item of (ped.itens ?? []); track $index) {
                     <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
