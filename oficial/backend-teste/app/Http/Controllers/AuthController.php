@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Usuario;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -16,16 +18,23 @@ class AuthController extends Controller
             'senha' => 'required'
         ]);
 
-        $email = $request->email;
-        $senha = $request->senha;
+        $email = trim((string) $request->input('email', ''));
+        $senha = (string) $request->input('senha', '');
 
-        $usuario = Usuario::where('email', $email)->first();
+        $usuario = Usuario::where('email', $email)->first()
+            ?? Usuario::whereRaw('TRIM(email) = ?', [$email])->first();
         if (!$usuario) {
             return response()->json(['error' => 'Credenciais inválidas'], 401);
         }
-        if (!Hash::check($senha, $usuario->senha)) {
-            // Migração: se a senha antiga estava em texto puro, valida e converte para hash
-            if ($usuario->senha === $senha) {
+
+        // Remove só lixo comum de import (ex.: \n no fim do varchar) sem alterar o hash bcrypt
+        $senhaDb = is_string($usuario->senha) ? rtrim($usuario->senha, "\r\n\t ") : $usuario->senha;
+
+        if (!Hash::check($senha, $senhaDb)) {
+            // Migração: senha antiga em texto puro (compara com valor bruto ou trimado)
+            $plainOk = is_string($usuario->senha)
+                && ($usuario->senha === $senha || trim($usuario->senha) === $senha);
+            if ($plainOk) {
                 $usuario->senha = Hash::make($senha);
                 $usuario->save();
             } else {
@@ -37,9 +46,20 @@ class AuthController extends Controller
             return response()->json(['error' => 'Usuário inativo'], 403);
         }
 
-        // 4️⃣ gera token
-        $token = $usuario->createToken('auth_token')->plainTextToken;
+        // Token Sanctum (tabela personal_access_tokens + APP_KEY)
+        try {
+            $token = $usuario->createToken('auth_token')->plainTextToken;
+        } catch (Throwable $e) {
+            Log::error('login.create_token', [
+                'usuario_id' => $usuario->id,
+                'erro' => $e->getMessage(),
+            ]);
 
+            return response()->json([
+                'error' => 'Falha ao gerar token de acesso.',
+                'detail' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Login válido',
@@ -47,8 +67,8 @@ class AuthController extends Controller
             'usuario' => [
                 'id' => $usuario->id,
                 'nome' => $usuario->nome,
-                'tipo_perfil' => $usuario->tipo_perfil
-            ]
+                'tipo_perfil' => $usuario->tipo_perfil,
+            ],
         ], 200);
     }
 

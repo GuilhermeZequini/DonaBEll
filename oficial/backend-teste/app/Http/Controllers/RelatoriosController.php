@@ -78,24 +78,24 @@ class RelatoriosController extends Controller
     /** Top produtos por quantidade vendida. */
     private function produtosMaisVendidos(int $ano, ?int $mes): array
     {
-        $query = DB::table('Itens_pedido')
-            ->join('Pedido', 'Itens_pedido.Pedido_id', '=', 'Pedido.id')
-            ->join('Produto', 'Itens_pedido.Produto_id', '=', 'Produto.id')
-            ->whereIn('Pedido.status', self::STATUS_VALIDOS)
-            ->whereYear('Pedido.data_cadastro', $ano);
+        $query = DB::table('itens_pedido')
+            ->join('pedido', 'itens_pedido.Pedido_id', '=', 'pedido.id')
+            ->join('produto', 'itens_pedido.Produto_id', '=', 'produto.id')
+            ->whereIn('pedido.status', self::STATUS_VALIDOS)
+            ->whereYear('pedido.data_cadastro', $ano);
 
         if ($mes) {
-            $query->whereMonth('Pedido.data_cadastro', $mes);
+            $query->whereMonth('pedido.data_cadastro', $mes);
         }
 
         return $query
             ->select(
-                'Produto.id as produto_id',
-                'Produto.nome as produto_nome',
-                DB::raw('SUM(Itens_pedido.quantidade) as quantidade_total'),
-                DB::raw('SUM(Itens_pedido.quantidade * Itens_pedido.preco_unitario) as valor_total')
+                'produto.id as produto_id',
+                'produto.nome as produto_nome',
+                DB::raw('SUM(itens_pedido.quantidade) as quantidade_total'),
+                DB::raw('SUM(itens_pedido.quantidade * itens_pedido.preco_unitario) as valor_total')
             )
-            ->groupBy('Produto.id', 'Produto.nome')
+            ->groupBy('produto.id', 'produto.nome')
             ->orderByDesc('quantidade_total')
             ->limit(15)
             ->get()
@@ -136,19 +136,19 @@ class RelatoriosController extends Controller
     {
         $meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-        $rows = DB::table('Itens_pedido')
-            ->join('Pedido', 'Itens_pedido.Pedido_id', '=', 'Pedido.id')
-            ->join('Produto', 'Itens_pedido.Produto_id', '=', 'Produto.id')
-            ->whereIn('Pedido.status', self::STATUS_VALIDOS)
-            ->whereYear('Pedido.data_cadastro', $ano)
+        $rows = DB::table('itens_pedido')
+            ->join('pedido', 'itens_pedido.Pedido_id', '=', 'pedido.id')
+            ->join('produto', 'itens_pedido.Produto_id', '=', 'produto.id')
+            ->whereIn('pedido.status', self::STATUS_VALIDOS)
+            ->whereYear('pedido.data_cadastro', $ano)
             ->select(
-                DB::raw('MONTH(Pedido.data_cadastro) as mes'),
-                'Produto.id as produto_id',
-                'Produto.nome as produto_nome',
-                DB::raw('SUM(Itens_pedido.quantidade) as quantidade')
+                DB::raw('MONTH(pedido.data_cadastro) as mes'),
+                'produto.id as produto_id',
+                'produto.nome as produto_nome',
+                DB::raw('SUM(itens_pedido.quantidade) as quantidade')
             )
-            ->groupBy(DB::raw('MONTH(Pedido.data_cadastro)'), 'Produto.id', 'Produto.nome')
-            ->orderBy(DB::raw('MONTH(Pedido.data_cadastro)'))
+            ->groupBy(DB::raw('MONTH(pedido.data_cadastro)'), 'produto.id', 'produto.nome')
+            ->orderBy(DB::raw('MONTH(pedido.data_cadastro)'))
             ->orderByDesc('quantidade')
             ->get();
 
@@ -193,14 +193,14 @@ class RelatoriosController extends Controller
     /** Rotas com mais pedidos. */
     private function rotasMaisPedidos(int $ano, ?int $mes): array
     {
-        $query = DB::table('Pedido')
-            ->join('cliente', 'Pedido.Cliente_Usuario_id', '=', 'cliente.Usuario_id')
+        $query = DB::table('pedido')
+            ->join('cliente', 'pedido.Cliente_Usuario_id', '=', 'cliente.Usuario_id')
             ->leftJoin('rota', 'cliente.Rota_id', '=', 'rota.id')
-            ->whereIn('Pedido.status', self::STATUS_VALIDOS)
-            ->whereYear('Pedido.data_cadastro', $ano);
+            ->whereIn('pedido.status', self::STATUS_VALIDOS)
+            ->whereYear('pedido.data_cadastro', $ano);
 
         if ($mes) {
-            $query->whereMonth('Pedido.data_cadastro', $mes);
+            $query->whereMonth('pedido.data_cadastro', $mes);
         }
 
         return $query
@@ -208,7 +208,7 @@ class RelatoriosController extends Controller
                 DB::raw('COALESCE(rota.id, 0) as rota_id'),
                 DB::raw('COALESCE(rota.nome, "Sem rota") as rota_nome'),
                 DB::raw('COUNT(*) as total_pedidos'),
-                DB::raw('SUM(Pedido.valor_total) as valor_total')
+                DB::raw('SUM(pedido.valor_total) as valor_total')
             )
             ->groupBy(DB::raw('COALESCE(rota.id, 0)'), DB::raw('COALESCE(rota.nome, "Sem rota")'))
             ->orderByDesc('total_pedidos')
@@ -227,13 +227,13 @@ class RelatoriosController extends Controller
     /** Vendedores com mais vendas. */
     private function vendedoresMaisVendas(int $ano, ?int $mes): array
     {
-        $query = DB::table('Pedido')
-            ->join('usuario', 'Pedido.Usuario_id', '=', 'usuario.id')
-            ->whereIn('Pedido.status', self::STATUS_VALIDOS)
-            ->whereYear('Pedido.data_cadastro', $ano);
+        $query = DB::table('pedido')
+            ->join('usuario', 'pedido.Usuario_id', '=', 'usuario.id')
+            ->whereIn('pedido.status', self::STATUS_VALIDOS)
+            ->whereYear('pedido.data_cadastro', $ano);
 
         if ($mes) {
-            $query->whereMonth('Pedido.data_cadastro', $mes);
+            $query->whereMonth('pedido.data_cadastro', $mes);
         }
 
         return $query
@@ -241,7 +241,7 @@ class RelatoriosController extends Controller
                 'usuario.id as usuario_id',
                 'usuario.nome as usuario_nome',
                 DB::raw('COUNT(*) as total_pedidos'),
-                DB::raw('SUM(Pedido.valor_total) as valor_total')
+                DB::raw('SUM(pedido.valor_total) as valor_total')
             )
             ->groupBy('usuario.id', 'usuario.nome')
             ->orderByDesc('valor_total')

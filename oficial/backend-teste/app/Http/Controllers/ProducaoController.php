@@ -73,20 +73,20 @@ class ProducaoController extends Controller
             Pedido::STATUS_PRONTO,
         ];
 
-        $itens = DB::table('Itens_pedido')
-            ->join('Pedido', 'Itens_pedido.Pedido_id', '=', 'Pedido.id')
-            ->join('cliente', 'Pedido.Cliente_Usuario_id', '=', 'cliente.Usuario_id')
-            ->join('Produto', 'Itens_pedido.Produto_id', '=', 'Produto.id')
-            ->whereIn('Pedido.status', $statusProdução)
+        $itens = DB::table('itens_pedido')
+            ->join('pedido', 'itens_pedido.Pedido_id', '=', 'pedido.id')
+            ->join('cliente', 'pedido.Cliente_Usuario_id', '=', 'cliente.Usuario_id')
+            ->join('produto', 'itens_pedido.Produto_id', '=', 'produto.id')
+            ->whereIn('pedido.status', $statusProdução)
             ->select(
                 'cliente.Rota_id',
-                'Itens_pedido.Produto_id',
-                'Produto.nome as produto_nome',
-                DB::raw('SUM(Itens_pedido.quantidade) as quantidade_total')
+                'itens_pedido.Produto_id',
+                'produto.nome as produto_nome',
+                DB::raw('SUM(itens_pedido.quantidade) as quantidade_total')
             )
-            ->groupBy('cliente.Rota_id', 'Itens_pedido.Produto_id', 'Produto.nome')
+            ->groupBy('cliente.Rota_id', 'itens_pedido.Produto_id', 'produto.nome')
             ->orderBy('cliente.Rota_id')
-            ->orderBy('Produto.nome')
+            ->orderBy('produto.nome')
             ->get();
 
         $porRota = [];

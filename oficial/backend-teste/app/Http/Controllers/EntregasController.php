@@ -140,7 +140,7 @@ class EntregasController extends Controller
         $request->validate([
             'rota_id' => 'required|integer|exists:rota,id',
             'pedido_ids' => 'required|array',
-            'pedido_ids.*' => 'required|integer|exists:Pedido,id',
+            'pedido_ids.*' => 'required|integer|exists:pedido,id',
         ]);
 
         $rotaId = (int) $request->rota_id;

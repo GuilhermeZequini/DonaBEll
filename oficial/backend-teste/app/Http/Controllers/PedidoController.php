@@ -38,7 +38,7 @@ class PedidoController extends Controller
         $request->validate([
             'Cliente_Usuario_id' => 'required|exists:cliente,Usuario_id',
             'itens' => 'required|array|min:1',
-            'itens.*.Produto_id' => 'required|exists:Produto,id',
+            'itens.*.Produto_id' => 'required|exists:produto,id',
             'itens.*.quantidade' => 'required|integer|min:1',
             'observacao' => 'nullable|string|max:255',
         ]);
@@ -108,7 +108,7 @@ class PedidoController extends Controller
 
         $request->validate([
             'itens' => 'sometimes|array|min:1',
-            'itens.*.Produto_id' => 'required_with:itens|exists:Produto,id',
+            'itens.*.Produto_id' => 'required_with:itens|exists:produto,id',
             'itens.*.quantidade' => 'required_with:itens|integer|min:1',
             'observacao' => 'nullable|string|max:255',
         ]);

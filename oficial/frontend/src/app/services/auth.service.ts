@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { API_URL } from '../config/api.config';
 
-// URL base da API do backend-teste (ajuste porta/host se necessário)
-const API_AUTH = 'http://127.0.0.1:8000/api';
+const API_AUTH = API_URL;
 
 export interface LoginResponse {
   message: string;

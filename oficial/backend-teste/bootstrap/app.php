@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // HTTPS atrás de proxy (Hostinger / load balancer)
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
         'perfil' => \App\Http\Middleware\PerfilMiddleware::class,
     ]);

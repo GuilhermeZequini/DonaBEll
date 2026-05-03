@@ -2,8 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Paginado } from '../models/paginado.model';
+import { API_URL } from '../config/api.config';
 
-const API = 'http://127.0.0.1:8000/api';
+const API = API_URL;
 
 export interface ItemPedidoPainel {
   id?: number;

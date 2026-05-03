@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Usuario , PaginacaoResponse } from './types/types';
 import { HttpParams } from '@angular/common/http';
+import { API_URL } from '../config/api.config';
 
 
 @Injectable({
@@ -10,7 +11,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class UsuarioService {
 
-  private readonly API = 'http://127.0.0.1:8000/api/users';
+  private readonly API = `${API_URL}/users`;
   private readonly REG_PER_PAGE = 10; // Deve ser o mesmo do backend
 
   constructor(private http: HttpClient) { }
