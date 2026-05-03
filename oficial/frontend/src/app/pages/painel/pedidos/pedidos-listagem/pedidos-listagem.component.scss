@@ -392,6 +392,38 @@
   margin-bottom: 0.35rem;
 }
 
+.pedido-form-ajuda {
+  margin: 0.35rem 0 0 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.pedido-form-aviso {
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+}
+
+.pedido-form-subtotal {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #111;
+  min-width: 5.5rem;
+  text-align: right;
+}
+
+.pedido-form-total-prev {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+  color: #111;
+}
+
 .pedido-form-grupo select,
 .pedido-form-grupo textarea {
   width: 100%;

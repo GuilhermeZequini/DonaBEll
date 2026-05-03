@@ -1,15 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { ProducaoPainelService, ColunaRota, ConsolidacaoRota } from '../../../../services/producao-painel.service';
+import { FormsModule } from '@angular/forms';
+import {
+  ProducaoPainelService,
+  SemanaProducao,
+  ConsolidacaoSemanaBloco,
+} from '../../../../services/producao-painel.service';
 
 @Component({
   selector: 'app-producao-painel',
   standalone: true,
+  imports: [FormsModule],
   templateUrl: './producao-painel.component.html',
   styleUrl: './producao-painel.component.scss',
 })
 export class ProducaoPainelComponent implements OnInit {
-  colunasRotas: ColunaRota[] = [];
-  consolidacao: ConsolidacaoRota[] = [];
+  /** Por semana: só APROVADO + EM_PRODUCAO; rotas sem pedidos na fila são omitidas. */
+  semanasFila: SemanaProducao[] = [];
+  /** Por semana: só PRONTO */
+  semanasProntos: SemanaProducao[] = [];
+  /** Consolidação: uma entrada por semana (mais recente primeiro). */
+  consolidacaoSemanas: ConsolidacaoSemanaBloco[] = [];
+  /** Quantas semanas exibir (1 = só a atual; máx. 26). */
+  nSemanasConsolidacao = 1;
+  carregandoConsolidacao = false;
   carregando = true;
   erro: string | null = null;
   abaAtiva: 'pedidos' | 'consolidacao' = 'pedidos';
@@ -25,7 +38,31 @@ export class ProducaoPainelComponent implements OnInit {
     this.erro = null;
     this.service.listarPorRotas().subscribe({
       next: (res) => {
-        this.colunasRotas = res.por_rota ?? [];
+        const semanas = res.por_semana ?? [];
+        this.semanasFila = semanas
+          .map((s) => ({
+            ...s,
+            por_rota: s.por_rota
+              .map((col) => ({
+                ...col,
+                pedidos: col.pedidos.filter((p) => p.status !== 'PRONTO'),
+              }))
+              .filter((col) => col.pedidos.length > 0),
+          }))
+          .filter((s) => s.por_rota.length > 0);
+
+        this.semanasProntos = semanas
+          .map((s) => ({
+            ...s,
+            por_rota: s.por_rota
+              .map((col) => ({
+                ...col,
+                pedidos: col.pedidos.filter((p) => p.status === 'PRONTO'),
+              }))
+              .filter((col) => col.pedidos.length > 0),
+          }))
+          .filter((s) => s.por_rota.length > 0);
+
         this.carregando = false;
       },
       error: () => {
@@ -33,12 +70,28 @@ export class ProducaoPainelComponent implements OnInit {
         this.carregando = false;
       },
     });
-    this.service.getConsolidacao().subscribe({
+    this.recarregarConsolidacao();
+  }
+
+  recarregarConsolidacao(): void {
+    this.carregandoConsolidacao = true;
+    this.service.getConsolidacao(this.nSemanasConsolidacao).subscribe({
       next: (res) => {
-        this.consolidacao = res.consolidacao ?? [];
+        this.consolidacaoSemanas = res.semanas ?? [];
+        this.carregandoConsolidacao = false;
       },
-      error: () => (this.consolidacao = []),
+      error: () => {
+        this.consolidacaoSemanas = [];
+        this.carregandoConsolidacao = false;
+      },
     });
+  }
+
+  onMudarNSemanasConsolidacao(): void {
+    const bruto = Number(this.nSemanasConsolidacao);
+    const n = Math.min(26, Math.max(1, Math.floor(Number.isFinite(bruto) ? bruto : 1)));
+    this.nSemanasConsolidacao = n;
+    this.recarregarConsolidacao();
   }
 
   marcarEmProducao(pedidoId: number): void {
@@ -75,6 +128,13 @@ export class ProducaoPainelComponent implements OnInit {
 
   formatarPreco(valor: number): string {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+  }
+
+  totalPedidosProntos(): number {
+    return this.semanasProntos.reduce(
+      (acc, s) => acc + s.por_rota.reduce((a2, c) => a2 + c.pedidos.length, 0),
+      0
+    );
   }
 
   formatarData(data: string | null): string {

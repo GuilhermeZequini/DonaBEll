@@ -1,0 +1,39 @@
+---
+description: Todo recurso/entidade deve ter CRUD completo (backend + frontend)
+alwaysApply: true
+---
+
+# CRUD completo em todos os recursos
+
+A partir de agora, **todo novo recurso ou entidade** do sistema deve ser implementado com **CRUD completo** em backend e frontend.
+
+## Backend (Laravel)
+
+- **Controller**: métodos `index`, `store`, `show`, `update`, `destroy`.
+- **Rotas**: usar `Route::apiResource('recurso', RecursoController::class)` (ou rotas equivalentes GET/POST/GET:id/PUT:id/DELETE:id).
+- **Model**: Eloquent com fillable e relacionamentos necessários.
+- **Validação**: `validate()` no store e update com regras claras.
+
+Exemplo de rota já usada no projeto:
+```php
+Route::apiResource('clientes', ClienteController::class);
+Route::apiResource('usuarios', UsuarioController::class);
+// rotas: index + store/show/update/destroy dentro de middleware quando necessário
+```
+
+## Frontend (Angular)
+
+- **Service**: métodos `listar()`, `buscar(id)`, `criar(dados)`, `atualizar(id, dados)`, `excluir(id)` chamando a API.
+- **Listagem**: página/componente com tabela, botão "Novo", filtros (se fizer sentido), ações Editar e Excluir por linha.
+- **Criar/Editar**: modal (como em Clientes/Rotas/Usuários listagem) ou página dedicada (como em Usuários novo/editar); formulário com validação e mensagens de erro.
+- **Excluir**: confirmação (ex.: `confirm()`) e chamada ao service; tratar erro.
+
+Padrão de serviços no projeto: `*-painel.service.ts` com interfaces para listagem (ex.: `ClientePainel`, `ClienteCreate`), base URL da API e métodos HTTP get/post/put/delete.
+
+## Entidades atuais com CRUD completo
+
+- **Clientes**: listagem + modal novo/editar + excluir; API clientes (apiResource).
+- **Usuários**: listagem + modal + página novo/editar + excluir; API usuarios (apiResource).
+- **Rotas**: listagem + modal novo/editar + excluir; API rotas (index + store/show/update/destroy).
+
+Ao adicionar **Pedidos**, **Produção**, **Produtos** ou qualquer nova entidade, seguir este mesmo padrão de CRUD completo.

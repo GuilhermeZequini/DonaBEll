@@ -25,6 +25,30 @@
     </div>
   </header>
 
+  <section class="relatorios-pagina__pdf-painel" aria-label="Exportar relatório em PDF">
+    <h2 class="relatorios-pagina__pdf-titulo">Exportar PDF</h2>
+    <p class="relatorios-pagina__pdf-desc">Escolha quais seções incluir no arquivo.</p>
+    <div class="relatorios-pagina__pdf-checks">
+      @for (item of secoesMeta; track item.key) {
+        <label class="relatorios-pagina__pdf-label">
+          <input type="checkbox" [(ngModel)]="secoesPdf[item.key]" />
+          {{ item.titulo }}
+        </label>
+      }
+    </div>
+    <div class="relatorios-pagina__pdf-acoes">
+      <button type="button" class="relatorios-pagina__btn relatorios-pagina__btn--outline" (click)="marcarTodasSecoesPdf()">
+        Marcar todos
+      </button>
+      <button type="button" class="relatorios-pagina__btn relatorios-pagina__btn--outline" (click)="desmarcarTodasSecoesPdf()">
+        Desmarcar todos
+      </button>
+      <button type="button" class="relatorios-pagina__btn" (click)="exportarPdfRelatorios()" [disabled]="carregando || !dados">
+        Baixar PDF
+      </button>
+    </div>
+  </section>
+
   @if (erro) {
     <p class="relatorios-pagina__erro">{{ erro }}</p>
   }

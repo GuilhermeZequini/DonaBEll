@@ -14,6 +14,123 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.entregas-pagina__pdf-painel {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 10px;
+}
+
+.entregas-pagina__pdf-titulo {
+  margin: 0 0 0.35rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.entregas-pagina__pdf-desc {
+  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.entregas-pagina__pdf-bloco {
+  margin-bottom: 1rem;
+}
+
+.entregas-pagina__pdf-sub {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f766e;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.entregas-pagina__pdf-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+
+  &--rotas {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #99f6e4;
+  }
+}
+
+.entregas-pagina__pdf-radios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.entregas-pagina__pdf-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: #0e7490;
+  }
+}
+
+.entregas-pagina__pdf-select {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  min-width: 160px;
+}
+
+.entregas-pagina__btn-pdf {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: #0e7490;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.entregas-pagina__btn-pdf:hover {
+  background: #0c6478;
+}
+
+.entregas-pagina__pdf-textarea {
+  width: 100%;
+  max-width: 560px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.875rem;
+  border: 1px solid #99f6e4;
+  border-radius: 6px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.entregas-pagina__pdf-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.entregas-pagina__btn-pdf--sec {
+  background: #155e75;
+
+  &:hover {
+    background: #164e63;
+  }
+}
+
 .entregas-pagina__filtros {
   display: flex;
   flex-wrap: wrap;

@@ -95,7 +95,7 @@ export class PedidosListagemComponent implements OnInit {
   abrirNovo(): void {
     this.modalEdicao = null;
     this.formClienteId = null;
-    this.formItens = [{ Produto_id: 0, quantidade: 1 }];
+    this.formItens = [];
     this.formObservacao = '';
     this.formErro = null;
     this.carregarClientesProdutos();
@@ -138,15 +138,50 @@ export class PedidosListagemComponent implements OnInit {
   }
 
   adicionarItem(): void {
+    if (!this.formClienteId) return;
     this.formItens.push({ Produto_id: 0, quantidade: 1 });
   }
 
   removerItem(index: number): void {
-    if (this.formItens.length > 1) this.formItens.splice(index, 1);
+    if (this.formItens.length > 0) this.formItens.splice(index, 1);
   }
 
   nomeProduto(produtoId: number): string {
     return this.produtos.find((x) => x.id === produtoId)?.nome ?? '—';
+  }
+
+  clienteSelecionadoPedido(): ClientePainel | null {
+    const id = this.formClienteId;
+    if (id == null) return null;
+    return this.clientes.find((c) => c.id === id) ?? null;
+  }
+
+  onClientePedidoChange(): void {
+    if (!this.modalEdicao) {
+      this.formItens = [];
+    }
+  }
+
+  labelTabelaPrecoCliente(): string {
+    const t = this.clienteSelecionadoPedido()?.tipo_cliente;
+    return t === 'PJ' ? 'PJ' : 'PF';
+  }
+
+  precoUnitarioParaCliente(prod: ProdutoPainel): number {
+    const c = this.clienteSelecionadoPedido();
+    if (!c) return Number(prod.preco_pf);
+    return c.tipo_cliente === 'PJ' ? Number(prod.preco_pj) : Number(prod.preco_pf);
+  }
+
+  subtotalLinhaPedido(item: { Produto_id: number; quantidade: number }): number {
+    if (!item.Produto_id || !this.formClienteId) return 0;
+    const p = this.produtos.find((x) => x.id === item.Produto_id);
+    if (!p) return 0;
+    return this.precoUnitarioParaCliente(p) * (item.quantidade || 0);
+  }
+
+  totalPreviewPedido(): number {
+    return this.formItens.reduce((acc, it) => acc + this.subtotalLinhaPedido(it), 0);
   }
 
   salvar(): void {

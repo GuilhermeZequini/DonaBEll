@@ -27,6 +27,98 @@
     </div>
   </div>
 
+  @if (!carregando && porSemana.length > 0) {
+    <section class="entregas-pagina__pdf-painel" aria-label="Exportar entregas em PDF">
+      <h2 class="entregas-pagina__pdf-titulo">Exportar PDF</h2>
+      <p class="entregas-pagina__pdf-desc">
+        Escolha semanas e rotas. Depois gere o <strong>roteiro do entregador</strong> (com endereço e itens) ou as
+        <strong>folhas por pedido</strong> (documento auxiliar, não é NF-e).
+      </p>
+
+      <div class="entregas-pagina__pdf-bloco">
+        <span class="entregas-pagina__pdf-sub">Semanas</span>
+        <div class="entregas-pagina__pdf-checks">
+          @for (s of porSemana; track s.semana_inicio) {
+            <label class="entregas-pagina__pdf-label">
+              <input type="checkbox" [(ngModel)]="pdfSemanas[s.semana_inicio]" />
+              {{ s.label }}
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="entregas-pagina__pdf-bloco">
+        <span class="entregas-pagina__pdf-sub">Rotas</span>
+        <div class="entregas-pagina__pdf-radios">
+          <label class="entregas-pagina__pdf-label">
+            <input type="radio" name="pdfModoRotas" value="todas" [(ngModel)]="pdfModoRotas" />
+            Todas
+          </label>
+          <label class="entregas-pagina__pdf-label">
+            <input type="radio" name="pdfModoRotas" value="uma" [(ngModel)]="pdfModoRotas" />
+            Uma rota
+          </label>
+          @if (pdfModoRotas === 'uma') {
+            <select
+              class="entregas-pagina__pdf-select"
+              [(ngModel)]="pdfRotaUnicaId"
+              [disabled]="rotasUnicasPdf().length === 0"
+            >
+              @for (r of rotasUnicasPdf(); track r.id) {
+                <option [ngValue]="r.id">{{ r.nome }}</option>
+              }
+            </select>
+          }
+          <label class="entregas-pagina__pdf-label">
+            <input type="radio" name="pdfModoRotas" value="varias" [(ngModel)]="pdfModoRotas" />
+            Várias rotas
+          </label>
+        </div>
+        @if (pdfModoRotas === 'varias') {
+          <div class="entregas-pagina__pdf-checks entregas-pagina__pdf-checks--rotas">
+            @for (r of rotasUnicasPdf(); track r.id) {
+              <label class="entregas-pagina__pdf-label">
+                <input type="checkbox" [(ngModel)]="pdfRotasVarias[r.id]" />
+                {{ r.nome }}
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="entregas-pagina__pdf-bloco">
+        <span class="entregas-pagina__pdf-sub">Instruções (roteiro)</span>
+        <textarea
+          class="entregas-pagina__pdf-textarea"
+          rows="3"
+          [(ngModel)]="pdfObsRoteiro"
+          name="pdfObsRoteiro"
+          placeholder="Ex.: Passar no restaurante X; deixar na portaria; ligar antes…"
+        ></textarea>
+      </div>
+
+      <div class="entregas-pagina__pdf-bloco">
+        <span class="entregas-pagina__pdf-sub">Rodapé nas folhas de pedido (opcional)</span>
+        <textarea
+          class="entregas-pagina__pdf-textarea"
+          rows="2"
+          [(ngModel)]="pdfObsRodapeNotas"
+          name="pdfObsRodapeNotas"
+          placeholder="Texto repetido no fim de cada página do PDF de pedidos…"
+        ></textarea>
+      </div>
+
+      <div class="entregas-pagina__pdf-botoes">
+        <button type="button" class="entregas-pagina__btn-pdf" (click)="exportarPdfRoteiro()">
+          PDF roteiro (entregador)
+        </button>
+        <button type="button" class="entregas-pagina__btn-pdf entregas-pagina__btn-pdf--sec" (click)="exportarPdfNotas()">
+          PDF notas dos pedidos
+        </button>
+      </div>
+    </section>
+  }
+
   @if (erro) {
     <p class="entregas-pagina__erro">{{ erro }}</p>
   }

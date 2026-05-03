@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Paginado } from '../models/paginado.model';
+
 import { API_URL } from '../config/api.config';
 
 const API = API_URL;

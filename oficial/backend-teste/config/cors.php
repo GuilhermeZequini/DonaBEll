@@ -1,10 +1,10 @@
 <?php
 
-// Junta: localhost (dev) + produção fixa + CORS_ALLOWED_ORIGINS do .env (sem duplicar).
+// Produção + origens locais (padrão) ou CORS_ALLOWED_ORIGINS no .env para somar/extra.
+$localDefaults = 'http://localhost:4200,http://127.0.0.1:4200,http://localhost:8000,http://127.0.0.1:8000';
 $bundles = [
-    'http://localhost:4200,http://127.0.0.1:4200,http://localhost:8000,http://127.0.0.1:8000',
     'https://donabel.site,https://www.donabel.site',
-    (string) env('CORS_ALLOWED_ORIGINS', ''),
+    (string) env('CORS_ALLOWED_ORIGINS', $localDefaults),
 ];
 
 $originSet = [];

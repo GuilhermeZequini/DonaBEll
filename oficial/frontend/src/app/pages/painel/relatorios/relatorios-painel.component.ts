@@ -5,6 +5,12 @@ import {
   RelatoriosPainelService,
   RelatoriosResponse,
 } from '../../../services/relatorios-painel.service';
+import {
+  PdfRelatoriosService,
+  SECOES_RELATORIO_META,
+  SecaoRelatorio,
+  secoesRelatorioPadraoTodas,
+} from '../../../services/pdf-relatorios.service';
 
 @Component({
   selector: 'app-relatorios-painel',
@@ -14,9 +20,12 @@ import {
   styleUrl: './relatorios-painel.component.scss',
 })
 export class RelatoriosPainelComponent implements OnInit {
+  readonly secoesMeta = SECOES_RELATORIO_META;
+
   dados: RelatoriosResponse | null = null;
   carregando = true;
   erro: string | null = null;
+  secoesPdf: Record<SecaoRelatorio, boolean> = secoesRelatorioPadraoTodas();
   ano = new Date().getFullYear();
   mes: number | null = null;
   meses = [
@@ -35,7 +44,10 @@ export class RelatoriosPainelComponent implements OnInit {
     { valor: 12, label: 'Dezembro' },
   ];
 
-  constructor(private relatoriosService: RelatoriosPainelService) {}
+  constructor(
+    private relatoriosService: RelatoriosPainelService,
+    private pdfRelatorios: PdfRelatoriosService
+  ) {}
 
   ngOnInit(): void {
     this.carregar();
@@ -126,5 +138,30 @@ export class RelatoriosPainelComponent implements OnInit {
   maxFaturamentoPorCliente(): number {
     if (!this.dados?.faturamento_por_cliente?.length) return 1;
     return this.safeMax(this.dados.faturamento_por_cliente.map((c) => c.valor_total || 0));
+  }
+
+  marcarTodasSecoesPdf(): void {
+    this.secoesPdf = secoesRelatorioPadraoTodas();
+  }
+
+  desmarcarTodasSecoesPdf(): void {
+    const v = secoesRelatorioPadraoTodas();
+    (Object.keys(v) as SecaoRelatorio[]).forEach((k) => {
+      v[k] = false;
+    });
+    this.secoesPdf = v;
+  }
+
+  exportarPdfRelatorios(): void {
+    if (!this.dados) {
+      alert('Carregue os relatórios antes de exportar o PDF.');
+      return;
+    }
+    const alguma = (Object.keys(this.secoesPdf) as SecaoRelatorio[]).some((k) => this.secoesPdf[k]);
+    if (!alguma) {
+      alert('Selecione ao menos uma seção para incluir no PDF.');
+      return;
+    }
+    this.pdfRelatorios.exportar(this.dados, this.secoesPdf);
   }
 }

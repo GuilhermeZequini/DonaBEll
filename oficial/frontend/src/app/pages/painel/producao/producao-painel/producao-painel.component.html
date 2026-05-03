@@ -22,72 +22,155 @@
   }
 
   @if (abaAtiva === 'pedidos' && !carregando) {
-    <div class="producao-colunas">
-      @for (col of colunasRotas; track col.rota?.id ?? col.rota?.nome ?? $index) {
-        <div class="producao-coluna">
-          <h3 class="producao-coluna__titulo">{{ col.rota?.nome ?? 'Rota' }}</h3>
-          @if (col.pedidos.length === 0) {
-            <p class="producao-coluna__vazio">Nenhum pedido</p>
-          } @else {
-            @for (ped of col.pedidos; track ped.id) {
-              <div class="producao-card">
-                <div class="producao-card__cabecalho">
-                  <strong>#{{ ped.id }}</strong> {{ ped.cliente_nome || 'Cliente' }}
+    <section class="producao-secao producao-secao--fila" aria-label="Fila de produção">
+      <h2 class="producao-secao__titulo">Na produção</h2>
+      <p class="producao-secao__desc">Aprovados e em produção — agrupados por semana do pedido (domingo a sábado). Só aparecem rotas com pedidos na fila.</p>
+      @if (semanasFila.length === 0) {
+        <p class="producao-secao__vazio-global">Nenhum pedido na fila de produção.</p>
+      } @else {
+        @for (semana of semanasFila; track semana.semana_inicio + '|' + semana.semana_fim) {
+          <div class="producao-semana-bloco">
+            <h3 class="producao-semana-bloco__titulo">{{ semana.label }}</h3>
+            <div class="producao-colunas">
+              @for (col of semana.por_rota; track col.rota?.id ?? col.rota?.nome ?? $index) {
+                <div class="producao-coluna">
+                  <h4 class="producao-coluna__titulo">{{ col.rota?.nome ?? 'Rota' }}</h4>
+                  @for (ped of col.pedidos; track ped.id) {
+                    <div class="producao-card">
+                      <div class="producao-card__cabecalho">
+                        <strong>#{{ ped.id }}</strong> {{ ped.cliente_nome || 'Cliente' }}
+                      </div>
+                      @if (ped.data_cadastro) {
+                        <p class="producao-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
+                      }
+                      <div class="producao-card__status">
+                        <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
+                      </div>
+                      <ul class="producao-card__itens">
+                        @for (item of (ped.itens ?? []); track $index) {
+                          <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                        }
+                      </ul>
+                      <div class="producao-card__acoes">
+                        @if (ped.status === 'APROVADO') {
+                          <button type="button" class="producao-card__btn" (click)="marcarEmProducao(ped.id)">Em produção</button>
+                        }
+                        @if (ped.status === 'EM_PRODUCAO') {
+                          <button type="button" class="producao-card__btn producao-card__btn--pronto" (click)="marcarPronto(ped.id)">Pronto</button>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
-                @if (ped.data_cadastro) {
-                  <p class="producao-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
+              }
+            </div>
+          </div>
+        }
+      }
+    </section>
+
+    @if (semanasProntos.length > 0) {
+      <section class="producao-secao producao-secao--prontos" aria-label="Pedidos prontos">
+        <div class="producao-secao__cabecalho-prontos">
+          <div>
+            <h2 class="producao-secao__titulo producao-secao__titulo--prontos">Prontos</h2>
+            <p class="producao-secao__desc">
+              {{ totalPedidosProntos() }} pedido(s) finalizado(s) — por semana e rota. Área rolável.
+            </p>
+          </div>
+        </div>
+        <div class="producao-prontos-scroll">
+          @for (semana of semanasProntos; track semana.semana_inicio + '|' + semana.semana_fim) {
+            <div class="producao-semana-bloco producao-semana-bloco--prontos">
+              <h3 class="producao-semana-bloco__titulo producao-semana-bloco__titulo--prontos">{{ semana.label }}</h3>
+              <div class="producao-colunas producao-colunas--prontos">
+                @for (col of semana.por_rota; track col.rota?.id ?? col.rota?.nome ?? $index) {
+                  <div class="producao-coluna producao-coluna--prontos">
+                    <h4 class="producao-coluna__titulo producao-coluna__titulo--prontos">{{ col.rota?.nome ?? 'Rota' }}</h4>
+                    @for (ped of col.pedidos; track ped.id) {
+                      <div class="producao-card producao-card--pronto">
+                        <div class="producao-card__cabecalho">
+                          <strong>#{{ ped.id }}</strong> {{ ped.cliente_nome || 'Cliente' }}
+                        </div>
+                        @if (ped.data_cadastro) {
+                          <p class="producao-card__data">Pedido em {{ formatarData(ped.data_cadastro) }}</p>
+                        }
+                        <div class="producao-card__status">
+                          <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
+                        </div>
+                        <div class="producao-card__valor">{{ formatarPreco(ped.valor_total ?? 0) }}</div>
+                        <ul class="producao-card__itens">
+                          @for (item of (ped.itens ?? []); track $index) {
+                            <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
+                          }
+                        </ul>
+                        <p class="producao-card__hint">Segue para entregas quando liberado.</p>
+                      </div>
+                    }
+                  </div>
                 }
-                <div class="producao-card__status">
-                  <span [class]="statusBadgeClass(ped.status)">{{ statusLabel(ped.status) }}</span>
-                </div>
-                <ul class="producao-card__itens">
-                  @for (item of (ped.itens ?? []); track $index) {
-                    <li>{{ item.produto_nome }}: {{ item.quantidade }}</li>
-                  }
-                </ul>
-                <div class="producao-card__acoes">
-                  @if (ped.status === 'APROVADO') {
-                    <button type="button" class="producao-card__btn" (click)="marcarEmProducao(ped.id)">Em produção</button>
-                  }
-                  @if (ped.status === 'EM_PRODUCAO') {
-                    <button type="button" class="producao-card__btn producao-card__btn--pronto" (click)="marcarPronto(ped.id)">Pronto</button>
-                  }
-                </div>
               </div>
-            }
+            </div>
           }
         </div>
-      }
-    </div>
+      </section>
+    }
   }
 
   @if (abaAtiva === 'consolidacao') {
-    <div class="producao-consolidacao">
-      @for (rota of consolidacao; track rota.rota_id ?? rota.rota_nome) {
-        <section class="producao-consolidacao__rota">
-          <h3 class="producao-consolidacao__titulo">{{ rota.rota_nome }}</h3>
-          @if (rota.produtos.length === 0) {
-            <p class="producao-consolidacao__vazio">Nenhum produto consolidado</p>
-          } @else {
-            <table class="producao-consolidacao__tabela">
-              <thead>
-                <tr>
-                  <th>Produto</th>
-                  <th>Quantidade total</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (linha of rota.produtos; track linha.Produto_id) {
-                  <tr>
-                    <td>{{ linha.produto_nome }}</td>
-                    <td>{{ linha.quantidade_total }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-        </section>
-      }
+    <div class="producao-consolidacao__toolbar">
+      <label class="producao-consolidacao__toolbar-label" for="n-semanas-consolidacao">Quantas semanas</label>
+      <input
+        id="n-semanas-consolidacao"
+        type="number"
+        class="producao-consolidacao__toolbar-input"
+        min="1"
+        max="26"
+        step="1"
+        [(ngModel)]="nSemanasConsolidacao"
+        (change)="onMudarNSemanasConsolidacao()"
+      />
+      <button type="button" class="producao-consolidacao__toolbar-btn" (click)="onMudarNSemanasConsolidacao()">Aplicar</button>
+      <span class="producao-consolidacao__toolbar-hint">Da semana atual para trás (domingo a sábado; data de cadastro do pedido). Máximo 26.</span>
     </div>
+    @if (carregandoConsolidacao) {
+      <p class="producao-pagina__loading">Carregando consolidação...</p>
+    } @else {
+      @for (bloco of consolidacaoSemanas; track bloco.periodo.inicio) {
+        <div class="producao-consolidacao-semana">
+          <h3 class="producao-consolidacao-semana__titulo">
+            {{ bloco.periodo.label }}
+            <span class="producao-consolidacao__periodo-datas">({{ bloco.periodo.inicio }} a {{ bloco.periodo.fim }})</span>
+          </h3>
+          @if (bloco.consolidacao.length === 0) {
+            <p class="producao-consolidacao__vazio-semana">Nenhuma quantidade nesta semana.</p>
+          } @else {
+            <div class="producao-consolidacao">
+              @for (rota of bloco.consolidacao; track rota.rota_id ?? rota.rota_nome) {
+                <section class="producao-consolidacao__rota">
+                  <h4 class="producao-consolidacao__titulo">{{ rota.rota_nome }}</h4>
+                  <table class="producao-consolidacao__tabela">
+                    <thead>
+                      <tr>
+                        <th>Produto</th>
+                        <th>Quantidade total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (linha of rota.produtos; track linha.Produto_id) {
+                        <tr>
+                          <td>{{ linha.produto_nome }}</td>
+                          <td>{{ linha.quantidade_total }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </section>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
   }
 </div>

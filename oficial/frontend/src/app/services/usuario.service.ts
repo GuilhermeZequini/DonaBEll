@@ -1,17 +1,15 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Usuario , PaginacaoResponse } from './types/types';
-import { HttpParams } from '@angular/common/http';
+import { Usuario, PaginacaoResponse } from './types/types';
 import { API_URL } from '../config/api.config';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuarioService {
-
-  private readonly API = `${API_URL}/users`;
+  /** Rota Laravel: GET /api/usuarios (não /users). */
+  private readonly API = `${API_URL}/usuarios`;
   private readonly REG_PER_PAGE = 10; // Deve ser o mesmo do backend
 
   constructor(private http: HttpClient) { }

@@ -6,6 +6,11 @@ import {
   PedidoEntregaResumo,
   SemanaEntrega,
 } from '../../../../services/entregas-painel.service';
+import {
+  PdfEntregasService,
+  PdfEntregasOpcoes,
+  PdfEntregasModo,
+} from '../../../../services/pdf-entregas.service';
 
 @Component({
   selector: 'app-entregas-painel',
@@ -18,6 +23,15 @@ export class EntregasPainelComponent implements OnInit {
   porSemana: SemanaEntrega[] = [];
   carregando = true;
   erro: string | null = null;
+  /** Checkboxes por semana_inicio */
+  pdfSemanas: Record<string, boolean> = {};
+  pdfModoRotas: PdfEntregasOpcoes['modoRotas'] = 'todas';
+  pdfRotaUnicaId: number | null = null;
+  pdfRotasVarias: Record<number, boolean> = {};
+  /** Observações impressas no roteiro (paradas, restaurante, etc.) */
+  pdfObsRoteiro = '';
+  /** Texto opcional no rodapé de cada página do PDF “notas” */
+  pdfObsRodapeNotas = '';
   ano = new Date().getFullYear();
   mes: number | null = null;
   meses = [
@@ -36,7 +50,10 @@ export class EntregasPainelComponent implements OnInit {
     { valor: 12, label: 'Dezembro' },
   ];
 
-  constructor(private service: EntregasPainelService) {}
+  constructor(
+    private service: EntregasPainelService,
+    private pdfEntregas: PdfEntregasService
+  ) {}
 
   ngOnInit(): void {
     this.carregar();
@@ -48,6 +65,7 @@ export class EntregasPainelComponent implements OnInit {
     this.service.listarPorSemana(this.ano, this.mes).subscribe({
       next: (res) => {
         this.porSemana = res.por_semana ?? [];
+        this.resetPdfSelecoes();
         this.carregando = false;
       },
       error: () => {
@@ -109,5 +127,89 @@ export class EntregasPainelComponent implements OnInit {
       style: 'currency',
       currency: 'BRL',
     }).format(valor);
+  }
+
+  rotasUnicasPdf(): { id: number; nome: string }[] {
+    const map = new Map<number, string>();
+    for (const s of this.porSemana) {
+      for (const col of s.por_rota ?? []) {
+        if (col.rota?.id != null) {
+          map.set(col.rota.id, col.rota.nome ?? `Rota ${col.rota.id}`);
+        }
+      }
+    }
+    return [...map.entries()]
+      .map(([id, nome]) => ({ id, nome }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  }
+
+  private resetPdfSelecoes(): void {
+    this.pdfSemanas = {};
+    for (const s of this.porSemana) {
+      this.pdfSemanas[s.semana_inicio] = true;
+    }
+    this.pdfModoRotas = 'todas';
+    const rotas = this.rotasUnicasPdf();
+    this.pdfRotaUnicaId = rotas.length ? rotas[0].id : null;
+    this.pdfRotasVarias = {};
+    for (const r of rotas) {
+      this.pdfRotasVarias[r.id] = true;
+    }
+    this.pdfObsRoteiro = '';
+    this.pdfObsRodapeNotas = '';
+  }
+
+  private montarOpcoesPdf(modo: PdfEntregasModo): PdfEntregasOpcoes | null {
+    if (!this.porSemana.length) {
+      alert('Não há dados para exportar.');
+      return null;
+    }
+    const selectedKeys = this.porSemana
+      .filter((s) => this.pdfSemanas[s.semana_inicio])
+      .map((s) => s.semana_inicio);
+    if (!selectedKeys.length) {
+      alert('Selecione ao menos uma semana.');
+      return null;
+    }
+    const semanasInicio: PdfEntregasOpcoes['semanasInicio'] =
+      selectedKeys.length === this.porSemana.length ? 'todas' : new Set(selectedKeys);
+
+    let rotaIds: number[] = [];
+    if (this.pdfModoRotas === 'uma') {
+      if (this.pdfRotaUnicaId == null) {
+        alert('Selecione uma rota.');
+        return null;
+      }
+      rotaIds = [this.pdfRotaUnicaId];
+    } else if (this.pdfModoRotas === 'varias') {
+      rotaIds = Object.entries(this.pdfRotasVarias)
+        .filter(([, v]) => v)
+        .map(([id]) => Number(id));
+      if (!rotaIds.length) {
+        alert('Selecione ao menos uma rota.');
+        return null;
+      }
+    }
+
+    return {
+      semanasInicio,
+      modoRotas: this.pdfModoRotas,
+      rotaIds,
+      modoPdf: modo,
+      observacaoRoteiro: this.pdfObsRoteiro,
+      observacaoRodapeNotas: this.pdfObsRodapeNotas,
+    };
+  }
+
+  exportarPdfRoteiro(): void {
+    const op = this.montarOpcoesPdf('roteiro_entregador');
+    if (!op) return;
+    this.pdfEntregas.exportar(this.porSemana, this.ano, this.mes, op);
+  }
+
+  exportarPdfNotas(): void {
+    const op = this.montarOpcoesPdf('notas_pedido');
+    if (!op) return;
+    this.pdfEntregas.exportar(this.porSemana, this.ano, this.mes, op);
   }
 }

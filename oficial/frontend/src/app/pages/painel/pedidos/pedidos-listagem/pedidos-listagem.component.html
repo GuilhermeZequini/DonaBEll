@@ -186,29 +186,55 @@
     <form (ngSubmit)="salvar()">
       <div class="pedido-form-grupo">
         <label for="cliente">Cliente <span class="obrigatorio">*</span></label>
-        <select id="cliente" [(ngModel)]="formClienteId" name="cliente" required>
-          <option [ngValue]="null">Selecione...</option>
+        <select
+          id="cliente"
+          [(ngModel)]="formClienteId"
+          name="cliente"
+          required
+          (ngModelChange)="onClientePedidoChange()"
+        >
+          <option [ngValue]="null">Selecione o cliente primeiro…</option>
           @for (c of clientes; track c.id) {
             <option [ngValue]="c.id">{{ c.nome }} ({{ c.tipo_cliente }})</option>
           }
         </select>
-      </div>
-      <div class="pedido-form-grupo">
-        <label>Itens do pedido</label>
-        @for (item of formItens; track $index) {
-          <div class="pedido-form-linha-item">
-            <select [(ngModel)]="item.Produto_id" name="produto_{{ $index }}">
-              <option [ngValue]="0">Selecione o produto</option>
-              @for (prod of produtos; track prod.id) {
-                <option [ngValue]="prod.id">{{ prod.nome }}</option>
-              }
-            </select>
-            <input type="number" [(ngModel)]="item.quantidade" name="qtd_{{ $index }}" min="1" placeholder="Qtd" />
-            <button type="button" class="pedido-form-btn-remover" (click)="removerItem($index)">Remover</button>
-          </div>
+        @if (formClienteId) {
+          <p class="pedido-form-ajuda">
+            Preços conforme tabela <strong>{{ labelTabelaPrecoCliente() }}</strong> deste cliente.
+          </p>
         }
-        <button type="button" class="pedido-form-btn-add" (click)="adicionarItem()">+ Adicionar item</button>
       </div>
+      @if (!formClienteId) {
+        <p class="pedido-form-aviso">Selecione o cliente para adicionar produtos e ver valores.</p>
+      } @else {
+        <div class="pedido-form-grupo">
+          <label>Itens do pedido</label>
+          @if (formItens.length === 0) {
+            <p class="pedido-form-aviso">Nenhum item. Clique em adicionar para incluir produtos.</p>
+          }
+          @for (item of formItens; track $index) {
+            <div class="pedido-form-linha-item">
+              <select [(ngModel)]="item.Produto_id" name="produto_{{ $index }}">
+                <option [ngValue]="0">Selecione o produto</option>
+                @for (prod of produtos; track prod.id) {
+                  <option [ngValue]="prod.id">
+                    {{ prod.nome }} — {{ formatarPreco(precoUnitarioParaCliente(prod)) }}
+                  </option>
+                }
+              </select>
+              <input type="number" [(ngModel)]="item.quantidade" name="qtd_{{ $index }}" min="1" placeholder="Qtd" />
+              @if (item.Produto_id > 0) {
+                <span class="pedido-form-subtotal">{{ formatarPreco(subtotalLinhaPedido(item)) }}</span>
+              }
+              <button type="button" class="pedido-form-btn-remover" (click)="removerItem($index)">Remover</button>
+            </div>
+          }
+          <button type="button" class="pedido-form-btn-add" (click)="adicionarItem()">+ Adicionar item</button>
+          <div class="pedido-form-total-prev">
+            <strong>Total estimado:</strong> {{ formatarPreco(totalPreviewPedido()) }}
+          </div>
+        </div>
+      }
       <div class="pedido-form-grupo">
         <label for="observacao">Observação</label>
         <textarea id="observacao" [(ngModel)]="formObservacao" name="observacao" rows="2"></textarea>

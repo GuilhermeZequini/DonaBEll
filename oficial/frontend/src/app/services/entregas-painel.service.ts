@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+
 import { API_URL } from '../config/api.config';
 
 const API = API_URL;
@@ -8,13 +9,17 @@ const API = API_URL;
 export interface PedidoEntregaResumo {
   id: number;
   cliente_nome: string | null;
+  cliente_documento?: string | null;
+  cliente_telefone?: string | null;
+  cliente_endereco?: string | null;
   status: string;
   valor_total: number;
   data_cadastro: string | null;
   ordem_entrega: number | null;
   rota_id: number | null;
   rota_nome: string | null;
-  itens: { produto_nome: string | null; quantidade: number }[];
+  observacao?: string | null;
+  itens: { produto_nome: string | null; quantidade: number; preco_unitario?: number }[];
 }
 
 export interface ColunaEntrega {

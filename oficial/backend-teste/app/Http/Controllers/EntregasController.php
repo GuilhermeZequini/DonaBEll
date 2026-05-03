@@ -162,17 +162,39 @@ class EntregasController extends Controller
         $itens = collect($p->itens ?? [])->map(fn ($i) => [
             'produto_nome' => $i->produto ? $i->produto->nome : null,
             'quantidade' => (int) $i->quantidade,
+            'preco_unitario' => (float) $i->preco_unitario,
         ])->values()->all();
+
+        $nomeCliente = null;
+        if ($cliente) {
+            $nomeCliente = $cliente->usuario?->nome ?? $cliente->nome;
+        }
+
+        $endereco = null;
+        if ($cliente) {
+            $partes = array_filter([
+                trim((string) ($cliente->rua ?? '')),
+                trim((string) ($cliente->numero ?? '')),
+                trim((string) ($cliente->bairro ?? '')),
+                trim((string) ($cliente->cidade ?? '')),
+                trim((string) ($cliente->complemento ?? '')),
+            ], fn ($s) => $s !== '');
+            $endereco = count($partes) ? implode(', ', $partes) : null;
+        }
 
         return [
             'id' => $p->id,
-            'cliente_nome' => $cliente && $cliente->usuario ? $cliente->usuario->nome : null,
+            'cliente_nome' => $nomeCliente,
+            'cliente_documento' => $cliente ? $cliente->CNPJ_CPF : null,
+            'cliente_telefone' => $cliente ? $cliente->telefone : null,
+            'cliente_endereco' => $endereco,
             'status' => $p->status,
             'valor_total' => (float) $p->valor_total,
             'data_cadastro' => $p->data_cadastro ? $p->data_cadastro->format('Y-m-d H:i:s') : null,
             'ordem_entrega' => $p->ordem_entrega,
             'rota_id' => $rota ? $rota->id : null,
             'rota_nome' => $rota ? $rota->nome : null,
+            'observacao' => $p->observacao,
             'itens' => $itens,
         ];
     }

@@ -1,59 +1,22 @@
-# Frontend
+# Frontend — SIG Dona BEll
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.16.
+SPA em **Angular 19** (componentes standalone) para o site público e o **painel** autenticado (clientes, pedidos, produção, entregas, etc.).
 
-## Development server
+## Documentação
 
-To start a local development server, run:
+- **[Guia do desenvolvedor (ambiente completo + API + padrões)](../GUIA_DESENVOLVEDOR.md)** — leia primeiro.
+- [Documentação de negócio / requisitos](../DOCUMENTACAO_SIG_DONA_BELL.md)
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Comandos rápidos
 
 ```bash
-ng generate component component-name
+npm install
+npx ng serve          # http://localhost:4200
+npx ng build --configuration=production
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+A URL da API em desenvolvimento está em `src/environments/environment.ts`. Os serviços devem usar `API_URL` de `src/app/config/api.config.ts` (não fixar `127.0.0.1` nos serviços).
 
-```bash
-ng generate --help
-```
+## Angular CLI
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Documentação genérica do CLI: [Angular CLI](https://angular.dev/tools/cli).

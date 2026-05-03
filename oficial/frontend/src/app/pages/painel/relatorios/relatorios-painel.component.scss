@@ -71,6 +71,68 @@
   background: #b91c1c;
 }
 
+.relatorios-pagina__btn--outline {
+  color: #dc2626;
+  background: #fff;
+  border: 1px solid #dc2626;
+
+  &:hover:not(:disabled) {
+    background: #fef2f2;
+  }
+}
+
+.relatorios-pagina__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.relatorios-pagina__pdf-painel {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.relatorios-pagina__pdf-titulo {
+  margin: 0 0 0.35rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.relatorios-pagina__pdf-desc {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.relatorios-pagina__pdf-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.relatorios-pagina__pdf-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+
+  input {
+    accent-color: #dc2626;
+  }
+}
+
+.relatorios-pagina__pdf-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .relatorios-pagina__erro {
   color: #dc2626;
   margin-bottom: 1rem;

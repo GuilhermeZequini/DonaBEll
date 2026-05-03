@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { API_URL } from '../config/api.config';
 
-const API_AUTH = API_URL;
-
 export interface LoginResponse {
   message: string;
   token: string;
@@ -28,7 +26,7 @@ const USER_KEY = 'auth_user';
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly apiUrl = API_AUTH;
+  private readonly apiUrl = API_URL;
 
   constructor(private http: HttpClient) {}
 

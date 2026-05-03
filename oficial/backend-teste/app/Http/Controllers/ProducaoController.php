@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pedido;
@@ -9,7 +10,11 @@ use App\Models\Rota;
 
 class ProducaoController extends Controller
 {
-    /** Pedidos aptos para produção: APROVADO, EM_PRODUCAO, PRONTO. Agrupados por rota (ordem de prioridade da rota). */
+    /**
+     * Pedidos APROVADO, EM_PRODUCAO, PRONTO.
+     * Agrupados por semana (domingo a sábado, data do pedido) e, em cada semana, por rota.
+     * Só entram rotas com pelo menos um pedido naquela semana.
+     */
     public function index(Request $request)
     {
         $statusProdução = [
@@ -22,104 +27,224 @@ class ProducaoController extends Controller
             ->whereIn('status', $statusProdução)
             ->get();
 
-        // Agrupar por rota: rota_id => [ pedidos ]. Rotas ordenadas por ordem_prioridade.
         $rotas = Rota::where('ativo', 1)->orderBy('ordem_prioridade')->orderBy('nome')->get();
-        $porRota = [];
-        foreach ($rotas as $rota) {
-            $porRota[$rota->id] = [
-                'rota' => ['id' => $rota->id, 'nome' => $rota->nome, 'ordem_prioridade' => $rota->ordem_prioridade],
-                'pedidos' => [],
-            ];
-        }
+        $rotasOrdenadas = $rotas->map(fn ($r) => $r->id)->all();
 
-        // Pedidos sem rota (cliente PF sem rota) - agrupar em "Sem rota"
-        $porRota['sem_rota'] = ['rota' => ['id' => null, 'nome' => 'Sem rota', 'ordem_prioridade' => 999], 'pedidos' => []];
+        /** @var array<string, array{semana_inicio: string, semana_fim: string, label: string, _rotas: array}> $porSemana */
+        $porSemana = [];
 
         foreach ($pedidos as $pedido) {
-            $p = $pedido->cliente ? $pedido->cliente : null;
-            $rotaId = $p && $p->Rota_id ? $p->Rota_id : 'sem_rota';
-            if (!isset($porRota[$rotaId])) {
-                $porRota[$rotaId] = [
-                    'rota' => $rotaId === 'sem_rota'
-                        ? ['id' => null, 'nome' => 'Sem rota', 'ordem_prioridade' => 999]
-                        : ['id' => $rotaId, 'nome' => 'Rota ' . $rotaId, 'ordem_prioridade' => 999],
+            $data = $pedido->data_cadastro ? Carbon::parse($pedido->data_cadastro) : null;
+            if (!$data) {
+                continue;
+            }
+
+            $inicioSemana = $data->copy()->startOfWeek(Carbon::SUNDAY);
+            $fimSemana = $inicioSemana->copy()->addDays(6);
+            $chaveSemana = $inicioSemana->format('Y-m-d');
+
+            if (!isset($porSemana[$chaveSemana])) {
+                $porSemana[$chaveSemana] = [
+                    'semana_inicio' => $inicioSemana->format('Y-m-d'),
+                    'semana_fim' => $fimSemana->format('Y-m-d'),
+                    'label' => $this->formatarLabelSemanaProducao($inicioSemana, $fimSemana),
+                    '_rotas' => [],
+                ];
+            }
+
+            $cliente = $pedido->cliente;
+            $rotaId = $cliente && $cliente->Rota_id ? $cliente->Rota_id : 'sem_rota';
+
+            if (!isset($porSemana[$chaveSemana]['_rotas'][$rotaId])) {
+                $porSemana[$chaveSemana]['_rotas'][$rotaId] = [
+                    'rota' => $this->metaRotaProducao($rotaId, $rotas),
                     'pedidos' => [],
                 ];
             }
-            $porRota[$rotaId]['pedidos'][] = $this->formatPedidoResumo($pedido);
+
+            $porSemana[$chaveSemana]['_rotas'][$rotaId]['pedidos'][] = $this->formatPedidoResumo($pedido);
         }
 
-        // Ordenar por ordem_prioridade e devolver apenas rotas que têm pedidos
-        $rotasOrdenadas = $rotas->map(fn ($r) => $r->id)->all();
-        $resultado = [];
-        foreach ($rotasOrdenadas as $rid) {
-            if (isset($porRota[$rid]) && !empty($porRota[$rid]['pedidos'])) {
-                $resultado[] = $porRota[$rid];
+        ksort($porSemana);
+
+        $resultadoSemanas = [];
+        foreach ($porSemana as $bloco) {
+            $map = $bloco['_rotas'];
+            $porRotaSemana = [];
+
+            foreach ($rotasOrdenadas as $rid) {
+                if (!empty($map[$rid]['pedidos'])) {
+                    $porRotaSemana[] = $map[$rid];
+                }
+            }
+            if (!empty($map['sem_rota']['pedidos'])) {
+                $porRotaSemana[] = $map['sem_rota'];
+            }
+
+            if (!empty($porRotaSemana)) {
+                unset($bloco['_rotas']);
+                $bloco['por_rota'] = $porRotaSemana;
+                $resultadoSemanas[] = $bloco;
             }
         }
-        if (!empty($porRota['sem_rota']['pedidos'])) {
-            $resultado[] = $porRota['sem_rota'];
-        }
 
-        return response()->json(['por_rota' => $resultado], 200);
+        return response()->json(['por_semana' => $resultadoSemanas], 200);
     }
 
-    /** Consolidação: por rota, lista de produtos com quantidade total a produzir. */
+    /** @param \Illuminate\Support\Collection<int, Rota> $rotas */
+    private function metaRotaProducao(int|string $rotaId, $rotas): array
+    {
+        if ($rotaId === 'sem_rota') {
+            return ['id' => null, 'nome' => 'Sem rota', 'ordem_prioridade' => 999];
+        }
+        $r = $rotas->firstWhere('id', $rotaId);
+
+        return $r
+            ? ['id' => $r->id, 'nome' => $r->nome, 'ordem_prioridade' => $r->ordem_prioridade]
+            : ['id' => (int) $rotaId, 'nome' => 'Rota ' . $rotaId, 'ordem_prioridade' => 999];
+    }
+
+    private function formatarLabelSemanaProducao(Carbon $inicio, Carbon $fim): string
+    {
+        $meses = [1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril', 5 => 'maio', 6 => 'junho',
+            7 => 'julho', 8 => 'agosto', 9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro'];
+        $mesInicio = $meses[$inicio->month] ?? '';
+        $mesFim = $meses[$fim->month] ?? '';
+        $ano = $inicio->year;
+        if ($mesInicio === $mesFim) {
+            return sprintf('%d a %d de %s de %d', $inicio->day, $fim->day, $mesInicio, $ano);
+        }
+
+        return sprintf('%d/%s a %d/%s de %d', $inicio->day, $mesInicio, $fim->day, $mesFim, $ano);
+    }
+
+    /**
+     * Consolidação por semana (domingo a sábado, data de cadastro do pedido).
+     * Query: n_semanas (1–26, padrão 1) — semana atual e semanas anteriores, uma entrada por semana.
+     */
     public function consolidacao(Request $request)
     {
+        $request->validate([
+            'n_semanas' => 'sometimes|integer|min:1|max:26',
+        ]);
+        $nSemanas = min(max((int) $request->query('n_semanas', 1), 1), 26);
+
+        $now = Carbon::now();
+        $inicioRange = $now->copy()->startOfWeek(Carbon::SUNDAY)->subWeeks($nSemanas - 1)->startOfDay();
+        $fimRange = $now->copy()->startOfWeek(Carbon::SUNDAY)->addDays(6)->endOfDay();
+
         $statusProdução = [
             Pedido::STATUS_APROVADO,
             Pedido::STATUS_EM_PRODUCAO,
             Pedido::STATUS_PRONTO,
         ];
 
-        $itens = DB::table('itens_pedido')
+        $rows = DB::table('itens_pedido')
             ->join('pedido', 'itens_pedido.Pedido_id', '=', 'pedido.id')
             ->join('cliente', 'pedido.Cliente_Usuario_id', '=', 'cliente.Usuario_id')
             ->join('produto', 'itens_pedido.Produto_id', '=', 'produto.id')
             ->whereIn('pedido.status', $statusProdução)
+            ->whereNotNull('pedido.data_cadastro')
+            ->whereBetween('pedido.data_cadastro', [$inicioRange, $fimRange])
             ->select(
                 'cliente.Rota_id',
                 'itens_pedido.Produto_id',
                 'produto.nome as produto_nome',
-                DB::raw('SUM(itens_pedido.quantidade) as quantidade_total')
+                'itens_pedido.quantidade',
+                'pedido.data_cadastro'
             )
-            ->groupBy('cliente.Rota_id', 'itens_pedido.Produto_id', 'produto.nome')
-            ->orderBy('cliente.Rota_id')
-            ->orderBy('produto.nome')
             ->get();
 
-        $porRota = [];
-        foreach ($itens as $row) {
-            $rotaId = $row->Rota_id ?? 'sem_rota';
-            if (!isset($porRota[$rotaId])) {
-                $porRota[$rotaId] = ['rota_id' => $rotaId, 'produtos' => []];
+        /** @var array<string, array<int|string, array<int, array{produto_nome: string, quantidade_total: int}>>> $bucket chave semana (Y-m-d domingo) */
+        $bucket = [];
+        foreach ($rows as $row) {
+            $d = Carbon::parse($row->data_cadastro);
+            $wk = $d->copy()->startOfWeek(Carbon::SUNDAY)->format('Y-m-d');
+            $rid = $row->Rota_id === null ? 'sem_rota' : (int) $row->Rota_id;
+            $pid = (int) $row->Produto_id;
+            if (!isset($bucket[$wk][$rid][$pid])) {
+                $bucket[$wk][$rid][$pid] = [
+                    'produto_nome' => $row->produto_nome,
+                    'quantidade_total' => 0,
+                ];
             }
-            $porRota[$rotaId]['produtos'][] = [
-                'Produto_id' => $row->Produto_id,
-                'produto_nome' => $row->produto_nome,
-                'quantidade_total' => (int) $row->quantidade_total,
+            $bucket[$wk][$rid][$pid]['quantidade_total'] += (int) $row->quantidade;
+        }
+
+        $semanas = [];
+        for ($k = 0; $k < $nSemanas; $k++) {
+            $domingo = $now->copy()->startOfWeek(Carbon::SUNDAY)->subWeeks($k);
+            $chave = $domingo->format('Y-m-d');
+            $sabado = $domingo->copy()->addDays(6);
+            $labelBase = $this->formatarLabelSemanaProducao($domingo->copy(), $sabado->copy());
+            $label = $k === 0
+                ? 'Semana atual (' . $labelBase . ')'
+                : $labelBase;
+            $meta = [
+                'tipo' => 'semana',
+                'label' => $label,
+                'inicio' => $domingo->format('Y-m-d'),
+                'fim' => $sabado->format('Y-m-d'),
+            ];
+            $mapPorRota = $this->mapaProdutosPorRotaDaSemana($bucket[$chave] ?? []);
+            $semanas[] = [
+                'periodo' => $meta,
+                'consolidacao' => $this->resultadoConsolidacaoOrdenadoPorRotas($mapPorRota),
             ];
         }
 
-        $rotas = Rota::where('ativo', 1)->orderBy('ordem_prioridade')->get();
+        return response()->json(['semanas' => $semanas], 200);
+    }
+
+    /**
+     * @param array<int|string, array<int, array{produto_nome: string, quantidade_total: int}>> $porRotaBruto
+     * @return array<int|string, array<int, array{Produto_id: int, produto_nome: string, quantidade_total: int}>>
+     */
+    private function mapaProdutosPorRotaDaSemana(array $porRotaBruto): array
+    {
+        $map = [];
+        foreach ($porRotaBruto as $rid => $byPid) {
+            $lista = [];
+            foreach ($byPid as $pid => $info) {
+                $lista[] = [
+                    'Produto_id' => $pid,
+                    'produto_nome' => $info['produto_nome'],
+                    'quantidade_total' => $info['quantidade_total'],
+                ];
+            }
+            usort($lista, fn ($a, $b) => strcmp($a['produto_nome'], $b['produto_nome']));
+            $map[$rid] = $lista;
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param array<int|string, array<int, array{Produto_id: int, produto_nome: string, quantidade_total: int}>> $mapPorRota
+     * @return array<int, array{rota_id: int|null, rota_nome: string, produtos: array<int, array<string, mixed>>}>
+     */
+    private function resultadoConsolidacaoOrdenadoPorRotas(array $mapPorRota): array
+    {
+        $rotas = Rota::where('ativo', 1)->orderBy('ordem_prioridade')->orderBy('nome')->get();
         $resultado = [];
         foreach ($rotas as $r) {
-            $resultado[] = [
-                'rota_id' => $r->id,
-                'rota_nome' => $r->nome,
-                'produtos' => isset($porRota[$r->id]) ? $porRota[$r->id]['produtos'] : [],
-            ];
+            if (!empty($mapPorRota[$r->id])) {
+                $resultado[] = [
+                    'rota_id' => $r->id,
+                    'rota_nome' => $r->nome,
+                    'produtos' => $mapPorRota[$r->id],
+                ];
+            }
         }
-        if (isset($porRota['sem_rota'])) {
+        if (!empty($mapPorRota['sem_rota'])) {
             $resultado[] = [
                 'rota_id' => null,
                 'rota_nome' => 'Sem rota',
-                'produtos' => $porRota['sem_rota']['produtos'],
+                'produtos' => $mapPorRota['sem_rota'],
             ];
         }
 
-        return response()->json(['consolidacao' => $resultado], 200);
+        return $resultado;
     }
 
     /** Atualizar status do pedido para EM_PRODUCAO ou PRONTO. */
