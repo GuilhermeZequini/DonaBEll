@@ -23,10 +23,10 @@ body {
    BANNER
 ========================= */
 .banner {
-  background: linear-gradient(135deg, #e53935, #c62828);
+  background: linear-gradient(135deg, #d8332f, #d8332f);
   color: #ffffff;
-  padding: 5rem 0;
-  margin-bottom: 4rem;
+  padding: 3rem 0;
+  margin-bottom: 3rem;
 }
 
 .banner .container {
@@ -50,9 +50,27 @@ body {
 }
 
 .banner-img {
-  max-width: 260px;
-  max-height: 180px;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
   object-fit: contain;
+  display: block;
+  margin-left: auto;
+  border-radius: 100%;
+}
+
+@media (max-width: 992px) {
+  .banner {
+    padding: 4rem 0;
+  }
+
+  .banner h1 {
+    font-size: 2.5rem;
+  }
+
+  .banner-img {
+    max-width: 420px;
+  }
 }
 
 /* BOTÃO */
@@ -153,11 +171,13 @@ body {
   .banner .container {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 1.5rem;
   }
 
   .banner .banner-img {
     order: -1;
-    margin: 0 auto;
+    margin: 0 auto 1rem;
+    max-width: 340px;
   }
 
   .banner h1 {

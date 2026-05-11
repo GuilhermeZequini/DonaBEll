@@ -149,3 +149,35 @@
 .painel-sidebar__sair-arrow {
   flex-shrink: 0;
 }
+
+@media (max-width: 992px) {
+  .painel-sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .painel-sidebar__brand {
+    padding: 1rem;
+  }
+
+  .painel-sidebar__nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .painel-sidebar__link {
+    white-space: nowrap;
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .painel-sidebar__user,
+  .painel-sidebar__footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

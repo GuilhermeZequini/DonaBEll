@@ -6,3 +6,11 @@
   width: calc(100% - 260px);
   max-width: none;
 }
+
+@media (max-width: 992px) {
+  .painel-conteudo {
+    margin-left: 0;
+    width: 100%;
+    padding: 1.25rem 1rem;
+  }
+}
